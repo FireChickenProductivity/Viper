@@ -1,7 +1,7 @@
 from talon import Module, Context, noise, actions, cron, scope, imgui, app
 from enum import Enum
 from .fire_chicken.mouse_position import MousePosition
-import math
+from .mouse_position_manipulation import change_mouse_position_by, compute_mouse_position_with_direction_and_magnitude
 from .direction_display import SingleLineDisplay
 from .fire_chicken import tag_utilities
 from .Dragging import MouseDragger
@@ -275,17 +275,6 @@ class DirectionDisplay:
         self.display.hide()
 
 hissing_control = HissingControl()
-
-def compute_mouse_position_with_direction_and_magnitude(direction: float, magnitude: int):
-    direction_in_radians = direction*math.pi/180
-    horizontal = magnitude*math.cos(direction_in_radians)
-    vertical = -magnitude*math.sin(direction_in_radians)
-    position = MousePosition(horizontal, vertical)
-    return position
-
-def change_mouse_position_by(change: MousePosition):
-    new_position: MousePosition = MousePosition.current() + change
-    new_position.go()
 
 @imgui.open()
 def gui(gui: imgui.GUI):
