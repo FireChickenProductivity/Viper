@@ -5,6 +5,7 @@ import math
 from .direction_display import SingleLineDisplay
 from .fire_chicken import tag_utilities
 from .Dragging import MouseDragger
+from .Menu import Menu
 
 module = Module()
 HISSING_CONTROL_TAG_BASE_NAME = 'fire_chicken_hissing_control'
@@ -118,7 +119,30 @@ class Actions:
         ''''''
         hissing_control.simulate_hissing_change(movement_delay_override = movement_delay)
 
+mouse_dragger = MouseDragger()
 
+def build_main_menu(hissing_control):
+    menu = Menu()
+    def pick_direction_and_move():
+        hissing_control.update_mode(HissingControlMode.DIRECTION_SELECTION)
+    def left_click():
+        actions.mouse_click(0)
+        mouse_dragger.stop_dragging()
+    def right_click():
+        actions.mouse_click(1)
+        mouse_dragger.stop_dragging()
+    def double_left_click():
+        actions.mouse_click(0)
+        actions.mouse_click(0)
+        mouse_dragger.stop_dragging()
+    def toggle_drag():
+        mouse_dragger.toggle_drag()
+    menu.add_item('Pick Direction and Move', pick_direction_and_move)
+    menu.add_item('Left Click', left_click)
+    menu.add_item('Right Click', right_click)
+    menu.add_item('Double Click', double_left_click)
+    menu.add_item('Toggle Holding Left Click Down', toggle_drag)
+    return menu
 
 MAXIMUM_ANGLE = 360
 
@@ -129,9 +153,9 @@ class HissingControl:
         self.job = None
         self.direction_display = DirectionDisplay()
         self.mouse_dragger = MouseDragger()
-        self.action = HissingControlAction.PICK_DIRECTION_AND_MOVE
         self.progress_towards_next_action = 0
         self.hissing_active = False
+        self.menu = build_main_menu(self)
 
     def reset_mode(self):
         self.update_mode(HissingControlMode.ACTION_SELECTION)
@@ -195,30 +219,14 @@ class HissingControl:
         self.stop_asynchronous_job()
         gui.hide()
         self.progress_towards_next_action = 0
-        self.perform_current_action()
-        self.action = HissingControlAction.PICK_DIRECTION_AND_MOVE 
+        self.menu.pick_current_item()
+        self.menu.reset_selection()
 
     def increase_progress_towards_next_action(self):
         self.progress_towards_next_action += 1
         if self.progress_towards_next_action >= next_action_progress_needed.get():
             self.progress_towards_next_action = 0
-            self.action = compute_next_hissing_control_action(self.action)
-
-    def perform_current_action(self):
-        if self.action == HissingControlAction.PICK_DIRECTION_AND_MOVE:
-            self.update_mode(HissingControlMode.DIRECTION_SELECTION)
-        elif self.action == HissingControlAction.LEFT_CLICK:
-            actions.mouse_click(0)
-            self.mouse_dragger.stop_dragging()
-        elif self.action == HissingControlAction.RIGHT_CLICK:
-            actions.mouse_click(1)
-            self.mouse_dragger.stop_dragging()
-        elif self.action == HissingControlAction.DOUBLE_LEFT_CLICK:
-            actions.mouse_click(0)
-            actions.mouse_click(0)
-            self.mouse_dragger.stop_dragging()
-        elif self.action == HissingControlAction.TOGGLE_HOLDING_LEFT_BUTTON_DOWN:
-            self.mouse_dragger.toggle_drag()
+            self.menu.select_next_item()
 
     def update_mode(self, mode):
         self.mode = mode
@@ -236,8 +244,8 @@ class HissingControl:
     def get_direction(self):
         return self.direction
     
-    def get_action(self):
-        return self.action
+    def get_menu(self):
+        return self.menu
     
     def change_direction_by(self, change_in_direction: float):
         self.direction += change_in_direction
@@ -313,11 +321,13 @@ def compute_formatted_action_name(action: HissingControlAction):
 
 @imgui.open()
 def gui(gui: imgui.GUI):
-    for action in HissingControlAction:
-        if action == hissing_control.get_action():
+    menu = hissing_control.get_menu()
+    for index, item in enumerate(menu.get_items()):
+        is_current_item = index == menu.get_current_item_number()
+        if is_current_item:
             gui.line()
-        gui.text(compute_formatted_action_name(action))
-        if action == hissing_control.get_action():
+        gui.text(item.get_display_name())
+        if is_current_item:
             gui.line()
 
 def on_ready():
