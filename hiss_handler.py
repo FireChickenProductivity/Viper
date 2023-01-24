@@ -1,4 +1,4 @@
-from talon import Module, Context, noise, actions, cron, scope, ctrl, imgui, app
+from talon import Module, Context, noise, actions, cron, scope, imgui, app
 from enum import Enum
 from .fire_chicken.mouse_position import MousePosition
 import math
@@ -258,24 +258,6 @@ class HissingControlMode(Enum):
     DIRECTION_SELECTION = 2
     MOVEMENT = 3
 
-NUMBER_OF_HISSING_CONTROL_ACTIONS = 6
-class HissingControlAction(Enum):
-    PICK_DIRECTION_AND_MOVE = 1
-    LEFT_CLICK = 2
-    RIGHT_CLICK = 3
-    DOUBLE_LEFT_CLICK = 4
-    TOGGLE_HOLDING_LEFT_BUTTON_DOWN = 5
-
-NUMBER_OF_HISSING_CONTROL_ACTIONS = 5
-
-def compute_next_hissing_control_action(current_action: HissingControlAction):
-    value = current_action.value
-    if value < NUMBER_OF_HISSING_CONTROL_ACTIONS:
-        new_action = HissingControlAction(value + 1)
-    else:
-        new_action = HissingControlAction(1)
-    return new_action
-
 class DirectionDisplay:
     def __init__(self):
         self.display = SingleLineDisplay()
@@ -314,10 +296,6 @@ def compute_mouse_position_with_direction_and_magnitude(direction: float, magnit
 def change_mouse_position_by(change: MousePosition):
     new_position: MousePosition = MousePosition.current() + change
     new_position.go()
-
-def compute_formatted_action_name(action: HissingControlAction):
-    name = action.name.lower().replace('_', ' ')
-    return name
 
 @imgui.open()
 def gui(gui: imgui.GUI):
