@@ -14,6 +14,7 @@ module.tag(HISSING_CONTROL_TAG_BASE_NAME, desc = 'Enables the fire chicken hissi
 module.tag(HISSING_CONTROL_TAG_BASE_NAME + '_action_selection', desc = 'Active when hissing selects the next fire chicken hissing control action')
 module.tag(HISSING_CONTROL_TAG_BASE_NAME + '_direction_selection', desc = 'Active when hissing chooses the next fire chicken hissing control action direction')
 module.tag(HISSING_CONTROL_TAG_BASE_NAME + '_movement', desc = 'Active when hissing moves the mouse through the fire chicken hissing control')
+module.tag(HISSING_CONTROL_TAG_BASE_NAME + '_scrolling', desc = 'Active when hissing scrolls through the fire chicken hissing control')
 HISSING_CONTROL_MODE_TAG_PREFIX = 'user.' + HISSING_CONTROL_TAG_BASE_NAME + '_'
 
 hissing_mode_context = Context()
@@ -138,11 +139,21 @@ def build_main_menu(hissing_control):
         mouse_dragger.stop_dragging()
     def toggle_drag():
         mouse_dragger.toggle_drag()
+    def switch_to_scroll_menu():
+        hissing_control.update_current_menu('scroll')
     menu.add_item('Pick Direction and Move', pick_direction_and_move)
     menu.add_item('Left Click', left_click)
     menu.add_item('Right Click', right_click)
     menu.add_item('Double Click', double_left_click)
     menu.add_item('Toggle Holding Left Click Down', toggle_drag)
+    menu.add_item('Scroll', switch_to_scroll_menu)
+    return menu
+
+def build_scroll_menu(hissing_control):     
+    menu = Menu()
+    def scroll_up():
+        hissing_control.update_mode(HissingControlMode.SCROLLING)
+    menu.add_item('Scroll up', scroll_up)
     return menu
 
 MAXIMUM_ANGLE = 360
@@ -156,7 +167,8 @@ class HissingControl:
         self.mouse_dragger = MouseDragger()
         self.progress_towards_next_action = 0
         self.hissing_active = False
-        self.menu = build_main_menu(self)
+        self.menus = {'main': build_main_menu(self), 'scroll': build_scroll_menu(self)}
+        self.menu = self.menus['main']
 
     def reset_mode(self):
         self.update_mode(HissingControlMode.ACTION_SELECTION)
@@ -175,6 +187,8 @@ class HissingControl:
             self.start_moving_mouse(movement_delay_override)
         elif self.mode == HissingControlMode.ACTION_SELECTION:
             self.start_increasing_progress_towards_next_action()
+        elif self.mode == HissingControlMode.SCROLLING:
+            self.start_scrolling(0, 0)
 
     def handle_hiss_ending(self):
         self.hissing_active = False
@@ -184,6 +198,8 @@ class HissingControl:
             self.stop_moving_mouse()
         elif self.mode == HissingControlMode.ACTION_SELECTION:
             self.stop_increasing_progress_towards_next_action()
+        elif self.mode == HissingControlMode.SCROLLING:
+            self.stop_scrolling()
 
     def start_moving_mouse(self, movement_delay_override):
         delay_amount = mouse_movement_delay.get()
@@ -210,6 +226,16 @@ class HissingControl:
             self.change_direction_by(direction_change_amount.get())
         self.job_handler.start_job(increase_direction, direction_change_delay.get())
     
+    def start_scrolling(self, vertical, horizontal):
+        def scroll():
+            actions.mouse_scroll(-120, 0)
+        self.job_handler.start_job(scroll, direction_change_delay.get())
+
+    def stop_scrolling(self):
+        self.job_handler.stop_job()
+        self.reset_mode()
+        hissing_control.update_current_menu('main')
+
     def start_decreasing_direction(self):
         def decrease_direction():
             self.change_direction_by(-direction_change_amount.get())
@@ -243,7 +269,10 @@ class HissingControl:
         self.mode = mode
         tag_name = HISSING_CONTROL_MODE_TAG_PREFIX + mode.name.lower()
         update_hissing_mode_context(tag_name)
-        
+    
+    def update_current_menu(self, name: str):
+        self.menu = self.menus[name]
+
     def get_direction(self):
         return self.direction
     
@@ -260,6 +289,7 @@ class HissingControlMode(Enum):
     ACTION_SELECTION = 1
     DIRECTION_SELECTION = 2
     MOVEMENT = 3
+    SCROLLING = 4
 
 class DirectionDisplay:
     def __init__(self):
