@@ -208,10 +208,10 @@ class HissingControl:
 
     def stop_increasing_progress_towards_next_action(self):
         self.stop_asynchronous_job()
+        gui.hide()
         self.progress_towards_next_action = 0
         self.perform_current_action()
         self.action = HissingControlAction.PICK_DIRECTION_AND_MOVE 
-        gui.hide()
 
     def increase_progress_towards_next_action(self):
         self.progress_towards_next_action += 1
