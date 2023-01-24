@@ -6,6 +6,7 @@ from .direction_display import SingleLineDisplay
 from .fire_chicken import tag_utilities
 from .Dragging import MouseDragger
 from .Menu import Menu
+from .asynchronous_job_scheduling import AsynchronousJobHandler
 
 module = Module()
 HISSING_CONTROL_TAG_BASE_NAME = 'fire_chicken_hissing_control'
@@ -150,7 +151,7 @@ class HissingControl:
     def __init__(self):
         self.reset_mode()
         self.direction = 0
-        self.job = None
+        self.job_handler = AsynchronousJobHandler()
         self.direction_display = DirectionDisplay()
         self.mouse_dragger = MouseDragger()
         self.progress_towards_next_action = 0
@@ -188,10 +189,10 @@ class HissingControl:
         delay_amount = mouse_movement_delay.get()
         if movement_delay_override:
             delay_amount = movement_delay_override
-        self.start_asynchronous_job(move_mouse, delay_amount)
+        self.job_handler.start_job(move_mouse, delay_amount)
 
     def stop_moving_mouse(self):
-        self.stop_asynchronous_job()
+        self.job_handler.stop_job()
         self.reset_mode()
 
     def start_changing_direction(self, should_increase_direction_on_direction_change):
@@ -201,22 +202,22 @@ class HissingControl:
             self.start_decreasing_direction()
 
     def start_increasing_direction(self):
-        self.start_asynchronous_job(increase_direction, direction_change_delay.get())
+        self.job_handler.start_job(increase_direction, direction_change_delay.get())
     
     def start_decreasing_direction(self):
-        self.start_asynchronous_job(decrease_direction, direction_change_delay.get())
+        self.job_handler.start_job(decrease_direction, direction_change_delay.get())
 
     def stop_changing_direction(self):
-        self.stop_asynchronous_job()
+        self.job_handler.stop_job()
         self.update_mode(HissingControlMode.MOVEMENT)
         cron.after(f'{direction_change_delay.get()*2}ms', self.direction_display.hide)
 
     def start_increasing_progress_towards_next_action(self):
-        self.start_asynchronous_job(make_progress_towards_next_action, next_action_progress_delay.get())
+        self.job_handler.start_job(make_progress_towards_next_action, next_action_progress_delay.get())
         gui.show()
 
     def stop_increasing_progress_towards_next_action(self):
-        self.stop_asynchronous_job()
+        self.job_handler.stop_job()
         gui.hide()
         self.progress_towards_next_action = 0
         self.menu.pick_current_item()
@@ -232,15 +233,7 @@ class HissingControl:
         self.mode = mode
         tag_name = HISSING_CONTROL_MODE_TAG_PREFIX + mode.name.lower()
         update_hissing_mode_context(tag_name)
-    
-    def stop_asynchronous_job(self):
-        if self.job:
-            cron.cancel(self.job)
-        self.job = None
-    
-    def start_asynchronous_job(self, job_function, time_between_calls_in_milliseconds: int):
-        self.job = cron.interval(f'{time_between_calls_in_milliseconds}ms', job_function)
-    
+        
     def get_direction(self):
         return self.direction
     
