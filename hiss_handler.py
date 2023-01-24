@@ -92,6 +92,13 @@ vertical_scroll_amount = module.setting(
     desc = 'How quickly to scroll vertically with the fire chicken hissing control'
 )
 
+horizontal_scroll_amount = module.setting(
+    'fire_chicken_hissing_control_horizontal_scroll_amount',
+    type = int,
+    default = 20,
+    desc = 'How quickly to scroll horizontally with the fire chicken hissing control'
+)
+
 def should_simulate_hiss_with_pop():
     return simulate_hiss_with_pop.get() != 0
 
@@ -165,8 +172,14 @@ def build_scroll_menu(hissing_control):
         buffer_scroll(-vertical_scroll_amount.get(), 0)
     def scroll_down():
         buffer_scroll(vertical_scroll_amount.get(), 0)
+    def scroll_right():
+        buffer_scroll(0, horizontal_scroll_amount.get())
+    def scroll_left():
+        buffer_scroll(0, -horizontal_scroll_amount.get())
     menu.add_item('Scroll Up', scroll_up)
     menu.add_item('Scroll Down', scroll_down)
+    menu.add_item('Scroll Right', scroll_right)
+    menu.add_item('Scroll Left', scroll_left)
     return menu
 
 MAXIMUM_ANGLE = 360
