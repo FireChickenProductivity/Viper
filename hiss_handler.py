@@ -4,6 +4,7 @@ from .fire_chicken.mouse_position import MousePosition
 import math
 from .direction_display import SingleLineDisplay
 from .fire_chicken import tag_utilities
+from .Dragging import MouseDragger
 
 module = Module()
 HISSING_CONTROL_TAG_BASE_NAME = 'fire_chicken_hissing_control'
@@ -117,23 +118,7 @@ class Actions:
         ''''''
         hissing_control.simulate_hissing_change(movement_delay_override = movement_delay)
 
-class MouseDragger:
-    def __init__(self):
-        self.is_dragging = False
-    
-    def toggle_drag(self):
-        if self.is_dragging:
-            self.stop_dragging()
-        else:
-            self.start_dragging()
-    
-    def start_dragging(self):
-        ctrl.mouse_click(button=0, down=True)
-        self.is_dragging = True
-    
-    def stop_dragging(self):
-        stop_holding_left_mouse_button_down()
-        self.is_dragging = False
+
 
 MAXIMUM_ANGLE = 360
 
@@ -224,12 +209,14 @@ class HissingControl:
             self.update_mode(HissingControlMode.DIRECTION_SELECTION)
         elif self.action == HissingControlAction.LEFT_CLICK:
             actions.mouse_click(0)
-            stop_holding_left_mouse_button_down()
+            self.mouse_dragger.stop_dragging()
         elif self.action == HissingControlAction.RIGHT_CLICK:
             actions.mouse_click(1)
+            self.mouse_dragger.stop_dragging()
         elif self.action == HissingControlAction.DOUBLE_LEFT_CLICK:
             actions.mouse_click(0)
             actions.mouse_click(0)
+            self.mouse_dragger.stop_dragging()
         elif self.action == HissingControlAction.TOGGLE_HOLDING_LEFT_BUTTON_DOWN:
             self.mouse_dragger.toggle_drag()
 
@@ -323,9 +310,6 @@ def change_mouse_position_by(change: MousePosition):
 def compute_formatted_action_name(action: HissingControlAction):
     name = action.name.lower().replace('_', ' ')
     return name
-
-def stop_holding_left_mouse_button_down():
-    ctrl.mouse_click(button=0, up=True)
 
 @imgui.open()
 def gui(gui: imgui.GUI):
