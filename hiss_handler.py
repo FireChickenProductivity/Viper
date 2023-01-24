@@ -85,6 +85,13 @@ pop_mouse_movement_delay = module.setting(
     desc = 'How long to pause between individual mouse movements with the fire chicken hissing control when movement is started with the popping sound'
 )
 
+vertical_scroll_amount = module.setting(
+    'fire_chicken_hissing_control_vertical_scroll_amount',
+    type = int,
+    default = 50,
+    desc = 'How quickly to scroll vertically with the fire chicken hissing control'
+)
+
 def should_simulate_hiss_with_pop():
     return simulate_hiss_with_pop.get() != 0
 
@@ -151,17 +158,26 @@ def build_main_menu(hissing_control):
 
 def build_scroll_menu(hissing_control):     
     menu = Menu()
-    def scroll_up():
+    def buffer_scroll(vertical: int, horizontal: int):
         hissing_control.update_mode(HissingControlMode.SCROLLING)
-    menu.add_item('Scroll up', scroll_up)
+        hissing_control.set_horizontal_and_vertical_scroll_amounts(vertical, horizontal)
+    def scroll_up():
+        buffer_scroll(-vertical_scroll_amount.get(), 0)
+    def scroll_down():
+        buffer_scroll(vertical_scroll_amount.get(), 0)
+    menu.add_item('Scroll Up', scroll_up)
+    menu.add_item('Scroll Down', scroll_down)
     return menu
 
 MAXIMUM_ANGLE = 360
+SCROLLING_DELAY_IN_MILLISECONDS = 50
 
 class HissingControl:
     def __init__(self):
         self.reset_mode()
         self.direction = 0
+        self.vertical_scroll_amount = 0
+        self.horizontal_scroll_amount = 0
         self.job_handler = AsynchronousJobHandler()
         self.direction_display = DirectionDisplay()
         self.mouse_dragger = MouseDragger()
@@ -188,7 +204,7 @@ class HissingControl:
         elif self.mode == HissingControlMode.ACTION_SELECTION:
             self.start_increasing_progress_towards_next_action()
         elif self.mode == HissingControlMode.SCROLLING:
-            self.start_scrolling(0, 0)
+            self.start_scrolling()
 
     def handle_hiss_ending(self):
         self.hissing_active = False
@@ -226,10 +242,14 @@ class HissingControl:
             self.change_direction_by(direction_change_amount.get())
         self.job_handler.start_job(increase_direction, direction_change_delay.get())
     
-    def start_scrolling(self, vertical, horizontal):
+    def start_scrolling(self):
         def scroll():
-            actions.mouse_scroll(-120, 0)
-        self.job_handler.start_job(scroll, direction_change_delay.get())
+            actions.mouse_scroll(self.vertical_scroll_amount, self.horizontal_scroll_amount)
+        self.job_handler.start_job(scroll, SCROLLING_DELAY_IN_MILLISECONDS)
+
+    def set_horizontal_and_vertical_scroll_amounts(self, vertical: int, horizontal: int):
+        self.vertical_scroll_amount = vertical
+        self.horizontal_scroll_amount = horizontal
 
     def stop_scrolling(self):
         self.job_handler.stop_job()
