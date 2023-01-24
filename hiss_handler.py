@@ -189,6 +189,10 @@ class HissingControl:
         delay_amount = mouse_movement_delay.get()
         if movement_delay_override:
             delay_amount = movement_delay_override
+        
+        def move_mouse():
+            mouse_position_change: MousePosition = compute_mouse_position_with_direction_and_magnitude(self.get_direction(), movement_amount.get())
+            change_mouse_position_by(mouse_position_change)
         self.job_handler.start_job(move_mouse, delay_amount)
 
     def stop_moving_mouse(self):
@@ -202,9 +206,13 @@ class HissingControl:
             self.start_decreasing_direction()
 
     def start_increasing_direction(self):
+        def increase_direction():
+            self.change_direction_by(direction_change_amount.get())
         self.job_handler.start_job(increase_direction, direction_change_delay.get())
     
     def start_decreasing_direction(self):
+        def decrease_direction():
+            self.change_direction_by(-direction_change_amount.get())
         self.job_handler.start_job(decrease_direction, direction_change_delay.get())
 
     def stop_changing_direction(self):
@@ -213,6 +221,8 @@ class HissingControl:
         cron.after(f'{direction_change_delay.get()*2}ms', self.direction_display.hide)
 
     def start_increasing_progress_towards_next_action(self):
+        def make_progress_towards_next_action():
+            self.increase_progress_towards_next_action()
         self.job_handler.start_job(make_progress_towards_next_action, next_action_progress_delay.get())
         gui.show()
 
@@ -265,19 +275,6 @@ class DirectionDisplay:
         self.display.hide()
 
 hissing_control = HissingControl()
-
-def make_progress_towards_next_action():
-    hissing_control.increase_progress_towards_next_action()
-
-def increase_direction():
-    hissing_control.change_direction_by(direction_change_amount.get())
-
-def decrease_direction():
-    hissing_control.change_direction_by(-direction_change_amount.get())
-
-def move_mouse():
-    mouse_position_change: MousePosition = compute_mouse_position_with_direction_and_magnitude(hissing_control.get_direction(), movement_amount.get())
-    change_mouse_position_by(mouse_position_change)
 
 def compute_mouse_position_with_direction_and_magnitude(direction: float, magnitude: int):
     direction_in_radians = direction*math.pi/180
