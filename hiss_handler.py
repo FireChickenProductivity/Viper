@@ -113,15 +113,29 @@ pop_horizontal_scroll_amount = module.setting(
     desc = 'How quickly to scroll horizontally with the fire chicken hissing control with pop input'
 )
 
+class OverrideValues:
+    def __init__(self, should_increase_direction_on_direction_change = True, movement_delay_override = False, vertical_scrolling_speed_override = False, 
+    horizontal_scrolling_speed_override = False):
+        self.should_increase_direction_on_direction_change = should_increase_direction_on_direction_change
+        self.movement_delay_override = movement_delay_override
+        self.vertical_scrolling_speed_override = vertical_scrolling_speed_override
+        self.horizontal_scrolling_speed_override = horizontal_scrolling_speed_override
+
 def should_simulate_hiss_with_pop():
     return simulate_hiss_with_pop.get() != 0
 
+def compute_pop_override_values():
+    values = OverrideValues(
+        movement_delay_override = pop_mouse_movement_delay.get(),
+            vertical_scrolling_speed_override = pop_vertical_scroll_amount.get(),
+            horizontal_scrolling_speed_override = pop_horizontal_scroll_amount.get()
+    )
+    return values
+
 def on_pop(active):
     if should_simulate_hiss_with_pop():
-        hissing_control.simulate_hissing_change(
-            movement_delay_override = pop_mouse_movement_delay.get(),
-            vertical_scrolling_speed_override =pop_vertical_scroll_amount.get(),
-            horizontal_scrolling_speed_override = pop_horizontal_scroll_amount.get())
+        pop_override_values = compute_pop_override_values()
+        hissing_control.simulate_hissing_change(pop_override_values)
 
 def on_hiss(active):
     if hissing_control_enabled():
@@ -146,11 +160,11 @@ class Actions:
     
     def fire_chicken_simulate_hissing_change_but_decrease_direction():
         ''''''
-        hissing_control.simulate_hissing_change(should_increase_direction_on_direction_change = False)
+        hissing_control.simulate_hissing_change(OverrideValues(should_increase_direction_on_direction_change = False))
 
     def fire_chicken_simulate_hissing_change_with_overridden_movement_delay(movement_delay: int):
         ''''''
-        hissing_control.simulate_hissing_change(movement_delay_override = movement_delay)
+        hissing_control.simulate_hissing_change(OverrideValues(movement_delay_override = movement_delay))
 
 mouse_dragger = MouseDragger()
 
@@ -219,23 +233,22 @@ class HissingControl:
     def reset_mode(self):
         self.update_mode(HissingControlMode.ACTION_SELECTION)
 
-    def simulate_hissing_change(self, should_increase_direction_on_direction_change = True, movement_delay_override = False, vertical_scrolling_speed_override = False,
-        horizontal_scrolling_speed_override = False):
+    def simulate_hissing_change(self, override_values: OverrideValues = OverrideValues()):
         if self.hissing_active:
             self.handle_hiss_ending()
         else:
-            self.handle_hiss_start(should_increase_direction_on_direction_change, movement_delay_override, vertical_scrolling_speed_override, horizontal_scrolling_speed_override)
+            self.handle_hiss_start(override_values)
 
-    def handle_hiss_start(self, should_increase_direction_on_direction_change, movement_delay_override, vertical_scrolling_speed_override, horizontal_scrolling_speed_override):
+    def handle_hiss_start(self, override_values: OverrideValues):
         self.hissing_active = True
         if self.mode == HissingControlMode.DIRECTION_SELECTION:
-            self.start_changing_direction(should_increase_direction_on_direction_change)
+            self.start_changing_direction(override_values.should_increase_direction_on_direction_change)
         elif self.mode == HissingControlMode.MOVEMENT:
-            self.start_moving_mouse(movement_delay_override)
+            self.start_moving_mouse(override_values.movement_delay_override)
         elif self.mode == HissingControlMode.ACTION_SELECTION:
             self.start_increasing_progress_towards_next_action()
         elif self.mode == HissingControlMode.SCROLLING:
-            self.start_scrolling(vertical_scrolling_speed_override, horizontal_scrolling_speed_override)
+            self.start_scrolling(override_values.vertical_scrolling_speed_override, override_values.horizontal_scrolling_speed_override)
 
     def handle_hiss_ending(self):
         self.hissing_active = False
