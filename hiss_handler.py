@@ -32,7 +32,7 @@ movement_amount = module.setting(
 direction_change_amount = module.setting(
     'fire_chicken_hissing_control_direction_change_amount',
     type = float,
-    default = 15.0,
+    default = 45.0,
     desc = 'How much to change the direction during each time step when changing the hissing control movement direction in degrees'
 )
 
@@ -46,7 +46,7 @@ mouse_movement_delay = module.setting(
 direction_change_delay = module.setting(
     'fire_chicken_hissing_control_direction_changed_delay',
     type = int,
-    default = 200,
+    default = 600,
     desc = 'How long to pause between individual changes in direction with the fire chicken hissing control in milliseconds'
 )
 
