@@ -263,12 +263,12 @@ class HissingControl:
             self.stop_scrolling()
 
     def start_moving_mouse(self, movement_delay_override):
+        current_direction = self.direction
         delay_amount = mouse_movement_delay.get()
         if movement_delay_override:
             delay_amount = movement_delay_override
-        
         def move_mouse():
-            mouse_position_change: MousePosition = compute_mouse_position_with_direction_and_magnitude(self.get_direction(), movement_amount.get())
+            mouse_position_change: MousePosition = compute_mouse_position_with_direction_and_magnitude(current_direction, movement_amount.get())
             change_mouse_position_by(mouse_position_change)
         self.job_handler.start_job(move_mouse, delay_amount)
 
@@ -305,11 +305,9 @@ class HissingControl:
 
     def lock_direction(self):
         self.direction_editable = False
-        print('locking')
     
     def unlock_direction(self):
         self.direction_editable = True
-        print('unlocking')
 
     def start_increasing_direction(self):
         def increase_direction():
@@ -325,7 +323,7 @@ class HissingControl:
         self.lock_direction()
         self.job_handler.stop_job()
         self.update_mode(HissingControlMode.MOVEMENT)
-        cron.after(f'{direction_change_delay.get()*2}ms', self.direction_display.hide)
+        cron.after(f'{direction_change_delay.get()*4}ms', self.direction_display.hide)
 
     def start_increasing_progress_towards_next_action(self):
         def make_progress_towards_next_action():
@@ -362,13 +360,13 @@ class HissingControl:
     
     def change_direction_by(self, change_in_direction: float):
         if self.direction_editable:
-            print('Changing the direction')
             self.direction += change_in_direction
             while self.direction > MAXIMUM_ANGLE:
                 self.direction -= MAXIMUM_ANGLE
-            self.direction_display.display_direction(self.direction)
-        else:
-            print('locked!!!!!!!!!!!!!!!!!!!!')
+            self.display_direction()
+    
+    def display_direction(self):
+        self.direction_display.display_direction(self.direction)
 
 def compute_scrolling_amount_override(original: int, override: int):
     if abs(original) > 0:
@@ -390,8 +388,9 @@ class DirectionDisplay:
     
     def display_direction(self, direction: float): 
         current_position = MousePosition.current()
-        change = compute_mouse_position_with_direction_and_magnitude(direction, direction_line_size.get())
-        target_position = current_position + change
+        change = compute_mouse_position_with_direction_and_magnitude(direction, movement_amount.get())
+        scaled_change = change*direction_line_size.get()*(1/change.compute_magnitude())
+        target_position = current_position + scaled_change
         self.display.display(current_position, target_position, current_position)
     
     def hide(self):
