@@ -323,7 +323,7 @@ class HissingControl:
         self.lock_direction()
         self.job_handler.stop_job()
         self.update_mode(HissingControlMode.MOVEMENT)
-        cron.after(f'{direction_change_delay.get()*4}ms', self.direction_display.hide)
+        cron.after(f'{direction_change_delay.get()*2}ms', self.direction_display.hide)
 
     def start_increasing_progress_towards_next_action(self):
         def make_progress_towards_next_action():
