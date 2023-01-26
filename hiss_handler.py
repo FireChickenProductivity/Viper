@@ -263,12 +263,11 @@ class HissingControl:
             self.stop_scrolling()
 
     def start_moving_mouse(self, movement_delay_override):
-        current_direction = self.direction
         delay_amount = mouse_movement_delay.get()
         if movement_delay_override:
             delay_amount = movement_delay_override
         def move_mouse():
-            mouse_position_change: MousePosition = compute_mouse_position_with_direction_and_magnitude(current_direction, movement_amount.get())
+            mouse_position_change: MousePosition = compute_mouse_position_with_direction_and_magnitude(self.get_direction(), movement_amount.get())
             change_mouse_position_by(mouse_position_change)
         self.job_handler.start_job(move_mouse, delay_amount)
 
