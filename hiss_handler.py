@@ -220,6 +220,7 @@ class HissingControl:
     def __init__(self):
         self.reset_mode()
         self.direction = 0
+        self.direction_editable = False
         self.vertical_scroll_amount = 0
         self.horizontal_scroll_amount = 0
         self.job_handler = AsynchronousJobHandler()
@@ -274,17 +275,6 @@ class HissingControl:
     def stop_moving_mouse(self):
         self.job_handler.stop_job()
         self.reset_mode()
-
-    def start_changing_direction(self, should_increase_direction_on_direction_change):
-        if should_increase_direction_on_direction_change:
-            self.start_increasing_direction()
-        else:
-            self.start_decreasing_direction()
-
-    def start_increasing_direction(self):
-        def increase_direction():
-            self.change_direction_by(direction_change_amount.get())
-        self.job_handler.start_job(increase_direction, direction_change_delay.get())
     
     def start_scrolling(self, vertical_scrolling_speed_override, horizontal_scrolling_speed_override):
         vertical_scroll_amount = self.vertical_scroll_amount
@@ -306,12 +296,33 @@ class HissingControl:
         self.reset_mode()
         hissing_control.update_current_menu('main')
 
+    def start_changing_direction(self, should_increase_direction_on_direction_change):
+        self.unlock_direction()
+        if should_increase_direction_on_direction_change:
+            self.start_increasing_direction()
+        else:
+            self.start_decreasing_direction()
+
+    def lock_direction(self):
+        self.direction_editable = False
+        print('locking')
+    
+    def unlock_direction(self):
+        self.direction_editable = True
+        print('unlocking')
+
+    def start_increasing_direction(self):
+        def increase_direction():
+            self.change_direction_by(direction_change_amount.get())
+        self.job_handler.start_job(increase_direction, direction_change_delay.get())
+
     def start_decreasing_direction(self):
         def decrease_direction():
             self.change_direction_by(-direction_change_amount.get())
         self.job_handler.start_job(decrease_direction, direction_change_delay.get())
 
     def stop_changing_direction(self):
+        self.lock_direction()
         self.job_handler.stop_job()
         self.update_mode(HissingControlMode.MOVEMENT)
         cron.after(f'{direction_change_delay.get()*2}ms', self.direction_display.hide)
@@ -350,10 +361,14 @@ class HissingControl:
         return self.menu
     
     def change_direction_by(self, change_in_direction: float):
-        self.direction += change_in_direction
-        while self.direction > MAXIMUM_ANGLE:
-            self.direction -= MAXIMUM_ANGLE
-        self.direction_display.display_direction(self.direction)
+        if self.direction_editable:
+            print('Changing the direction')
+            self.direction += change_in_direction
+            while self.direction > MAXIMUM_ANGLE:
+                self.direction -= MAXIMUM_ANGLE
+            self.direction_display.display_direction(self.direction)
+        else:
+            print('locked!!!!!!!!!!!!!!!!!!!!')
 
 def compute_scrolling_amount_override(original: int, override: int):
     if abs(original) > 0:
