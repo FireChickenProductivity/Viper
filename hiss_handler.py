@@ -113,6 +113,13 @@ pop_horizontal_scroll_amount = module.setting(
     desc = 'How quickly to scroll horizontally with the fire chicken hissing control with pop input'
 )
 
+hissing_start_time = module.setting(
+    'fire_chicken_hissing_control_hissing_start_time',
+    type = int,
+    default = 0,
+    desc = 'How long you must hiss in milliseconds before you are considered to have start hissing. Increasing this can reduce false positive hiss recognition.'
+)
+
 class OverrideValues:
     def __init__(self, should_increase_direction_on_direction_change = True, movement_delay_override = False, vertical_scrolling_speed_override = False, 
     horizontal_scrolling_speed_override = False):
@@ -137,9 +144,43 @@ def on_pop(active):
         pop_override_values = compute_pop_override_values()
         hissing_control.simulate_hissing_change(pop_override_values)
 
+class DelayedHissingJobHandler:
+    def __init__(self):
+        self.job = None
+        self.hiss_successfully_started = False
+    
+    def handled_delayed_hiss(self, active):
+        if active:
+            self.start_delayed_hiss()
+        else:
+            self.stop_delayed_hiss()
+    
+    def start_delayed_hiss(self):
+        self.job = cron.after(f'{hissing_start_time.get()}ms', self.start_hiss_if_not_canceled)
+        
+    def start_hiss_if_not_canceled(self):
+        actions.user.fire_chicken_simulate_hissing_change()
+        self.hiss_successfully_started = True
+        self.job = None
+    
+    def stop_delayed_hiss(self):
+        self.cancel_job()
+        if self.hiss_successfully_started:
+            actions.user.fire_chicken_simulate_hissing_change()
+            self.hiss_successfully_started = False
+    
+    def cancel_job(self):
+        if self.job:
+            cron.cancel(self.job)
+        self.job = None
+
+delayed_hissing_job_handler = DelayedHissingJobHandler()
 def on_hiss(active):
     if hissing_control_enabled():
-        actions.user.fire_chicken_simulate_hissing_change()
+        if hissing_start_time.get() > 0:
+            delayed_hissing_job_handler.handled_delayed_hiss(active)
+        else:
+            actions.user.fire_chicken_simulate_hissing_change()
 
 def hissing_control_enabled():
     tags = scope.get("tag")
