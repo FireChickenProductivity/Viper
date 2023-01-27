@@ -113,6 +113,13 @@ pop_horizontal_scroll_amount = module.setting(
     desc = 'How quickly to scroll horizontally with the fire chicken hissing control with pop input'
 )
 
+hissing_start_time = module.setting(
+    'fire_chicken_hissing_control_hissing_start_time',
+    type = int,
+    default = 0,
+    desc = 'How long you must hiss in milliseconds before you are considered to have start hissing. Increasing this can reduce false positive hiss recognition.'
+)
+
 class OverrideValues:
     def __init__(self, should_increase_direction_on_direction_change = True, movement_delay_override = False, vertical_scrolling_speed_override = False, 
     horizontal_scrolling_speed_override = False):
@@ -137,9 +144,38 @@ def on_pop(active):
         pop_override_values = compute_pop_override_values()
         hissing_control.simulate_hissing_change(pop_override_values)
 
+hissing_state = ''
 def on_hiss(active):
     if hissing_control_enabled():
+        if hissing_start_time.get() > 0:
+            handled_delayed_hiss(active)
+        else:
+            actions.user.fire_chicken_simulate_hissing_change()
+
+def handled_delayed_hiss(active):
+    if active:
+        start_delayed_hiss()
+    else:
+        stop_delayed_hiss()
+
+def start_delayed_hiss():
+    global hissing_state
+    hissing_state = 'start'
+    print('has started')
+    cron.after(f'{hissing_start_time.get()}ms', start_hiss_if_not_canceled)
+
+def start_hiss_if_not_canceled():
+    global hissing_state
+    if hissing_state == 'start':
         actions.user.fire_chicken_simulate_hissing_change()
+        hissing_state = 'started'
+
+def stop_delayed_hiss():
+    global hissing_state
+    print('stopping', hissing_state)
+    if hissing_state == 'started':
+        actions.user.fire_chicken_simulate_hissing_change()
+    hissing_state = 'stopped'
 
 def hissing_control_enabled():
     tags = scope.get("tag")
