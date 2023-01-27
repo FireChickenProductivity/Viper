@@ -161,6 +161,7 @@ class DelayedHissingJobHandler:
     def start_hiss_if_not_canceled(self):
         actions.user.fire_chicken_simulate_hissing_change()
         self.hiss_successfully_started = True
+        self.job = None
     
     def stop_delayed_hiss(self):
         self.cancel_job()
