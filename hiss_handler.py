@@ -144,38 +144,42 @@ def on_pop(active):
         pop_override_values = compute_pop_override_values()
         hissing_control.simulate_hissing_change(pop_override_values)
 
-hissing_state = ''
+class DelayedHissingJobHandler:
+    def __init__(self):
+        self.job = None
+        self.hiss_successfully_started = False
+    
+    def handled_delayed_hiss(self, active):
+        if active:
+            self.start_delayed_hiss()
+        else:
+            self.stop_delayed_hiss()
+    
+    def start_delayed_hiss(self):
+        self.job = cron.after(f'{hissing_start_time.get()}ms', self.start_hiss_if_not_canceled)
+        
+    def start_hiss_if_not_canceled(self):
+        actions.user.fire_chicken_simulate_hissing_change()
+        self.hiss_successfully_started = True
+    
+    def stop_delayed_hiss(self):
+        self.cancel_job()
+        if self.hiss_successfully_started:
+            actions.user.fire_chicken_simulate_hissing_change()
+            self.hiss_successfully_started = False
+    
+    def cancel_job(self):
+        if self.job:
+            cron.cancel(self.job)
+        self.job = None
+
+delayed_hissing_job_handler = DelayedHissingJobHandler()
 def on_hiss(active):
     if hissing_control_enabled():
         if hissing_start_time.get() > 0:
-            handled_delayed_hiss(active)
+            delayed_hissing_job_handler.handled_delayed_hiss(active)
         else:
             actions.user.fire_chicken_simulate_hissing_change()
-
-def handled_delayed_hiss(active):
-    if active:
-        start_delayed_hiss()
-    else:
-        stop_delayed_hiss()
-
-def start_delayed_hiss():
-    global hissing_state
-    hissing_state = 'start'
-    print('has started')
-    cron.after(f'{hissing_start_time.get()}ms', start_hiss_if_not_canceled)
-
-def start_hiss_if_not_canceled():
-    global hissing_state
-    if hissing_state == 'start':
-        actions.user.fire_chicken_simulate_hissing_change()
-        hissing_state = 'started'
-
-def stop_delayed_hiss():
-    global hissing_state
-    print('stopping', hissing_state)
-    if hissing_state == 'started':
-        actions.user.fire_chicken_simulate_hissing_change()
-    hissing_state = 'stopped'
 
 def hissing_control_enabled():
     tags = scope.get("tag")
