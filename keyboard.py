@@ -153,15 +153,26 @@ def create_keyboard_menu(hissing_control):
         [KeyBoardItem('a'), KeyBoardItem('b'), KeyBoardItem('c'), KeyBoardItem('d'), KeyBoardItem('e'), KeyBoardItem('f')],
         'a-f'
     )
-
     g_k = RowItem(
         [KeyBoardItem('g'), KeyBoardItem('h'), KeyBoardItem('i'), KeyBoardItem('j'), KeyBoardItem('k')],
         'g-k'
+    )
+    l_p = RowItem(
+        [KeyBoardItem('l'), KeyBoardItem('m'), KeyBoardItem('n'), KeyBoardItem('o'), KeyBoardItem('p')],
+        'l-p'
+    )
+    q_u = RowItem(
+        [KeyBoardItem('q'), KeyBoardItem('r'), KeyBoardItem('s'), KeyBoardItem('t'), KeyBoardItem('u')],
+        'q-u'
+    )
+    v_z = RowItem(
+        [KeyBoardItem('v'), KeyBoardItem('w'), KeyBoardItem('x'), KeyBoardItem('y'), KeyBoardItem('z')],
+        'v-z'
     )
 
     def return_to_main_menu():
         hissing_control.update_current_menu('main')
     close_menu_item = MenuItem('close keyboard', return_to_main_menu)
-    keyboard = KeyBoard([movement_keys, modifier_keys, a_f, g_k, close_menu_item])
+    keyboard = KeyBoard([movement_keys, modifier_keys, a_f, g_k, l_p, q_u, v_z, close_menu_item])
     menu = KeyboardMenu(keyboard)
     return menu
