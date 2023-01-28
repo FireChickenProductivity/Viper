@@ -36,13 +36,17 @@ class RowItem:
 
 class KeyBoard:
     _keys_to_hold = ["shift","ctrl","alt","super"]
-    def __init__(self, rows):
-        self.rows = rows
+    def __init__(self):
+        self.rows = []
         self.current_keystroke = ''
         self.current_row = 0
         self.current_column = 0
         self.last_keystroke = ''
     
+    def set_rows(self, rows):
+        self.rows = rows
+        self.reset_selection()
+
     def pick_current_key(self):
         key: KeyBoardItem = self.get_current_key()
         self.add_key_to_keystroke(key)
@@ -111,11 +115,11 @@ class KeyboardMenu:
         self.is_picking_row = True
     
     def pick_current_item(self):
-        if self.is_picking_column():
-            self.keyboard.pick_current_key()
         if self.keyboard.is_on_single_item_row():
             self.keyboard.pick_current_single_item_row()
         else:
+            if self.is_picking_column():
+                self.keyboard.pick_current_key()
             self.swap_picking_row_versus_column()
 
     def is_picking_column(self):
@@ -144,6 +148,7 @@ class KeyboardMenu:
         return self.keyboard.get_current_column()
 
 def create_keyboard_menu(hissing_control):
+    keyboard = KeyBoard()
     movement_keys = RowItem(
         [KeyBoardItem('right'), KeyBoardItem('down'), KeyBoardItem('up'), KeyBoardItem('left'), KeyBoardItem('end'), KeyBoardItem('home'), KeyBoardItem('pagedown', 'page down'),
          KeyBoardItem('pageup', 'page up')],
@@ -174,7 +179,9 @@ def create_keyboard_menu(hissing_control):
         hissing_control.update_current_menu('main')
         hissing_control.reset_mode()
     close_menu_item = MenuItem('close keyboard', return_to_main_menu)
-    keyboard = KeyBoard([movement_keys, modifier_keys, a_f, g_k, l_p, q_u, v_z, punctuation, digits, editing_enter_tab_space, symbols, close_menu_item])
+    repeat_last_keystroke_item = MenuItem('repeat last keystroke', keyboard.repeat_last_keystroke)
+    
+    keyboard.set_rows([repeat_last_keystroke_item, movement_keys, modifier_keys, a_f, g_k, l_p, q_u, v_z, punctuation, digits, editing_enter_tab_space, symbols, close_menu_item])
     menu = KeyboardMenu(keyboard)
     return menu
 
