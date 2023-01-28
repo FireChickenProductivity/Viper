@@ -30,6 +30,9 @@ class RowItem:
     
     def get_display_name(self):
         return self.display_name
+    
+    def is_individual_item(self):
+        return False
 
 class KeyBoard:
     _keys_to_hold = ["shift","ctrl","alt","super"]
@@ -88,12 +91,12 @@ class KeyBoard:
     
     def get_current_row_items(self):
         return self.rows
-
-    def is_on_close_menu_row(self):
-        return self.current_row == len(self.rows) - 1
     
-    def close_menu(self):
-        self.rows[-1].pick_item()
+    def pick_current_single_item_row(self):
+        self.rows[self.current_row].pick_item()
+
+    def is_on_single_item_row(self):
+        return self.rows[self.current_row].is_individual_item()
     
     def reset_selection(self):
         self.current_row = 0
@@ -110,8 +113,8 @@ class KeyboardMenu:
     def pick_current_item(self):
         if self.is_picking_column():
             self.keyboard.pick_current_key()
-        if self.keyboard.is_on_close_menu_row():
-            self.keyboard.close_menu()
+        if self.keyboard.is_on_single_item_row():
+            self.keyboard.pick_current_single_item_row()
         else:
             self.swap_picking_row_versus_column()
 
