@@ -181,7 +181,7 @@ def create_keyboard_menu(hissing_control):
     close_menu_item = MenuItem('close keyboard', return_to_main_menu)
     repeat_last_keystroke_item = MenuItem('repeat last keystroke', keyboard.repeat_last_keystroke)
     
-    keyboard.set_rows([repeat_last_keystroke_item, movement_keys, modifier_keys, a_f, g_k, l_p, q_u, v_z, punctuation, digits, editing_enter_tab_space, symbols, close_menu_item])
+    keyboard.set_rows([repeat_last_keystroke_item, modifier_keys, a_f, g_k, l_p, q_u, v_z, punctuation, digits, editing_enter_tab_space, movement_keys, symbols, close_menu_item])
     menu = KeyboardMenu(keyboard)
     return menu
 
