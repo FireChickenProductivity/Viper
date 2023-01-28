@@ -110,9 +110,10 @@ class KeyboardMenu:
     def pick_current_item(self):
         if self.is_picking_column():
             self.keyboard.pick_current_key()
-        elif self.keyboard.is_on_close_menu_row():
-                self.keyboard.close_menu()
-        self.swap_picking_row_versus_column()
+        if self.keyboard.is_on_close_menu_row():
+            self.keyboard.close_menu()
+        else:
+            self.swap_picking_row_versus_column()
 
     def is_picking_column(self):
         return not self.is_picking_row
@@ -169,6 +170,7 @@ def create_keyboard_menu(hissing_control):
         [KeyBoardItem('v'), KeyBoardItem('w'), KeyBoardItem('x'), KeyBoardItem('y'), KeyBoardItem('z')],
         'vwxyz'
     )
+    
 
     def return_to_main_menu():
         hissing_control.update_current_menu('main')
