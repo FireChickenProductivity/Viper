@@ -16,6 +16,7 @@ module.tag(HISSING_CONTROL_TAG_BASE_NAME + '_action_selection', desc = 'Active w
 module.tag(HISSING_CONTROL_TAG_BASE_NAME + '_direction_selection', desc = 'Active when hissing chooses the next fire chicken hissing control action direction')
 module.tag(HISSING_CONTROL_TAG_BASE_NAME + '_movement', desc = 'Active when hissing moves the mouse through the fire chicken hissing control')
 module.tag(HISSING_CONTROL_TAG_BASE_NAME + '_scrolling', desc = 'Active when hissing scrolls through the fire chicken hissing control')
+module.tag(HISSING_CONTROL_TAG_BASE_NAME + '_keyboard', desc = 'Active with the fire chicken hissing keyboard control')
 HISSING_CONTROL_MODE_TAG_PREFIX = 'user.' + HISSING_CONTROL_TAG_BASE_NAME + '_'
 
 hissing_mode_context = Context()
@@ -230,6 +231,7 @@ def build_main_menu(hissing_control):
         hissing_control.update_current_menu('scroll')
     def switch_to_keyboard_menu():
         hissing_control.update_current_menu('keyboard')
+        hissing_control.update_mode(HissingControlMode.KEYBOARD)
     menu.add_item('Pick Direction and Move', pick_direction_and_move)
     menu.add_item('Left Click', left_click)
     menu.add_item('Right Click', right_click)
@@ -291,7 +293,7 @@ class HissingControl:
             self.start_changing_direction(override_values.should_increase_direction_on_direction_change)
         elif self.mode == HissingControlMode.MOVEMENT:
             self.start_moving_mouse(override_values.movement_delay_override)
-        elif self.mode == HissingControlMode.ACTION_SELECTION:
+        elif self.should_select_action():
             self.start_increasing_progress_towards_next_action()
         elif self.mode == HissingControlMode.SCROLLING:
             self.start_scrolling(override_values.vertical_scrolling_speed_override, override_values.horizontal_scrolling_speed_override)
@@ -302,10 +304,13 @@ class HissingControl:
             self.stop_changing_direction()
         elif self.mode == HissingControlMode.MOVEMENT:
             self.stop_moving_mouse()
-        elif self.mode == HissingControlMode.ACTION_SELECTION:
+        elif self.should_select_action():
             self.stop_increasing_progress_towards_next_action()
         elif self.mode == HissingControlMode.SCROLLING:
             self.stop_scrolling()
+
+    def should_select_action(self):
+        return self.mode in [HissingControlMode.ACTION_SELECTION, HissingControlMode.KEYBOARD]
 
     def start_moving_mouse(self, movement_delay_override):
         delay_amount = mouse_movement_delay.get()
@@ -426,6 +431,7 @@ class HissingControlMode(Enum):
     DIRECTION_SELECTION = 2
     MOVEMENT = 3
     SCROLLING = 4
+    KEYBOARD = 5
 
 class DirectionDisplay:
     def __init__(self):
