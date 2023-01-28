@@ -1,6 +1,9 @@
 from talon import actions
 from .Menu import MenuItem
 
+#whatIV contributed significantly to the keyboard code
+#I made considerable edits to integrate it into my system
+
 class KeyBoardItem:
     def __init__(self, key_name: str, display_name = None):
         self.key_name = key_name
