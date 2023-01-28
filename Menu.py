@@ -38,3 +38,6 @@ class MenuItem:
     
     def get_display_name(self):
         return self.display_name
+
+    def is_individual_item(self):
+        return True
