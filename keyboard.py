@@ -150,31 +150,31 @@ def create_keyboard_menu(hissing_control):
         [KeyBoardItem('ctrl', 'control'), KeyBoardItem('shift'), KeyBoardItem('alt'), KeyBoardItem('super')],
         'Modifiers'
     )
-    a_f = RowItem(
-        [KeyBoardItem('a'), KeyBoardItem('b'), KeyBoardItem('c'), KeyBoardItem('d'), KeyBoardItem('e'), KeyBoardItem('f')],
-        'abcdef'
+    a_f = create_single_character_row('abcdef')
+    g_k = create_single_character_row('ghijk')
+    l_p = create_single_character_row('lmnop')
+    q_u = create_single_character_row('qrstu')
+    v_z = create_single_character_row('vwxyz')
+    punctuation = RowItem(
+        [KeyBoardItem('.', 'period'), KeyBoardItem(',', 'comma'), KeyBoardItem('?', 'question mark'), KeyBoardItem('!', 'exclamation mark'),
+         KeyBoardItem(':', 'colon'), KeyBoardItem(';', 'semicolon'), KeyBoardItem("'", 'quote'), KeyBoardItem('-', 'dash')],
+        'punctuation'
     )
-    g_k = RowItem(
-        [KeyBoardItem('g'), KeyBoardItem('h'), KeyBoardItem('i'), KeyBoardItem('j'), KeyBoardItem('k')],
-        'ghijk'
+    editing_enter_tab_space = RowItem(
+        [KeyBoardItem('space'), KeyBoardItem('enter'), KeyBoardItem('tab'), KeyBoardItem('backspace'), KeyBoardItem('delete'), KeyBoardItem('end enter', 'end-enter')],
+        'space enter tab editing'
     )
-    l_p = RowItem(
-        [KeyBoardItem('l'), KeyBoardItem('m'), KeyBoardItem('n'), KeyBoardItem('o'), KeyBoardItem('p')],
-        'lmnop'
-    )
-    q_u = RowItem(
-        [KeyBoardItem('q'), KeyBoardItem('r'), KeyBoardItem('s'), KeyBoardItem('t'), KeyBoardItem('u')],
-        'qrstu'
-    )
-    v_z = RowItem(
-        [KeyBoardItem('v'), KeyBoardItem('w'), KeyBoardItem('x'), KeyBoardItem('y'), KeyBoardItem('z')],
-        'vwxyz'
-    )
-    
 
     def return_to_main_menu():
         hissing_control.update_current_menu('main')
     close_menu_item = MenuItem('close keyboard', return_to_main_menu)
-    keyboard = KeyBoard([movement_keys, modifier_keys, a_f, g_k, l_p, q_u, v_z, close_menu_item])
+    keyboard = KeyBoard([movement_keys, modifier_keys, a_f, g_k, l_p, q_u, v_z, punctuation, editing_enter_tab_space, close_menu_item])
     menu = KeyboardMenu(keyboard)
     return menu
+
+def create_single_character_row(characters: str, name: str = ''):
+    if name == '':
+        name = characters
+    items = [KeyBoardItem(character) for character in characters]
+    result = RowItem(items, name)
+    return result
