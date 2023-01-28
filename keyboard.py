@@ -169,6 +169,7 @@ def create_keyboard_menu(hissing_control):
 
     def return_to_main_menu():
         hissing_control.update_current_menu('main')
+        hissing_control.reset_mode()
     close_menu_item = MenuItem('close keyboard', return_to_main_menu)
     keyboard = KeyBoard([movement_keys, modifier_keys, a_f, g_k, l_p, q_u, v_z, punctuation, digits, editing_enter_tab_space, symbols, close_menu_item])
     menu = KeyboardMenu(keyboard)
