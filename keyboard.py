@@ -169,8 +169,8 @@ def create_keyboard_menu(hissing_control):
         'punctuation'
     )
     editing_enter_tab_space = RowItem(
-        [KeyBoardItem('space'), KeyBoardItem('enter'), KeyBoardItem('tab'), KeyBoardItem('backspace'), KeyBoardItem('delete'), KeyBoardItem('end enter', 'end-enter')],
-        'space enter tab editing'
+        [KeyBoardItem('space'), KeyBoardItem('enter'), KeyBoardItem('tab'), KeyBoardItem('escape'), KeyBoardItem('backspace'), KeyBoardItem('delete'), KeyBoardItem('end enter', 'end-enter')],
+        'space enter tab escape editing'
     )
     symbols = create_single_character_row('+-=*/_@$%^#|()\\~`{}[]', 'symbols')
     digits = create_single_character_row('1234567890')
