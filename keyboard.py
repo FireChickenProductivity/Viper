@@ -164,11 +164,13 @@ def create_keyboard_menu(hissing_control):
         [KeyBoardItem('space'), KeyBoardItem('enter'), KeyBoardItem('tab'), KeyBoardItem('backspace'), KeyBoardItem('delete'), KeyBoardItem('end enter', 'end-enter')],
         'space enter tab editing'
     )
+    symbols = create_single_character_row('+-=*/_@$%^#|()\\~`{}[]', 'symbols')
+    digits = create_single_character_row('1234567890')
 
     def return_to_main_menu():
         hissing_control.update_current_menu('main')
     close_menu_item = MenuItem('close keyboard', return_to_main_menu)
-    keyboard = KeyBoard([movement_keys, modifier_keys, a_f, g_k, l_p, q_u, v_z, punctuation, editing_enter_tab_space, close_menu_item])
+    keyboard = KeyBoard([movement_keys, modifier_keys, a_f, g_k, l_p, q_u, v_z, punctuation, digits, editing_enter_tab_space, symbols, close_menu_item])
     menu = KeyboardMenu(keyboard)
     return menu
 
