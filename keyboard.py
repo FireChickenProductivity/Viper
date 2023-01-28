@@ -151,23 +151,23 @@ def create_keyboard_menu(hissing_control):
     )
     a_f = RowItem(
         [KeyBoardItem('a'), KeyBoardItem('b'), KeyBoardItem('c'), KeyBoardItem('d'), KeyBoardItem('e'), KeyBoardItem('f')],
-        'a-f'
+        'abcdef'
     )
     g_k = RowItem(
         [KeyBoardItem('g'), KeyBoardItem('h'), KeyBoardItem('i'), KeyBoardItem('j'), KeyBoardItem('k')],
-        'g-k'
+        'ghijk'
     )
     l_p = RowItem(
         [KeyBoardItem('l'), KeyBoardItem('m'), KeyBoardItem('n'), KeyBoardItem('o'), KeyBoardItem('p')],
-        'l-p'
+        'lmnop'
     )
     q_u = RowItem(
         [KeyBoardItem('q'), KeyBoardItem('r'), KeyBoardItem('s'), KeyBoardItem('t'), KeyBoardItem('u')],
-        'q-u'
+        'qrstu'
     )
     v_z = RowItem(
         [KeyBoardItem('v'), KeyBoardItem('w'), KeyBoardItem('x'), KeyBoardItem('y'), KeyBoardItem('z')],
-        'v-z'
+        'vwxyz'
     )
 
     def return_to_main_menu():
