@@ -7,6 +7,7 @@ from .fire_chicken import tag_utilities
 from .Dragging import MouseDragger
 from .Menu import Menu
 from .asynchronous_job_scheduling import AsynchronousJobHandler
+from .keyboard import create_keyboard_menu
 
 module = Module()
 HISSING_CONTROL_TAG_BASE_NAME = 'fire_chicken_hissing_control'
@@ -227,12 +228,15 @@ def build_main_menu(hissing_control):
         mouse_dragger.toggle_drag()
     def switch_to_scroll_menu():
         hissing_control.update_current_menu('scroll')
+    def switch_to_keyboard_menu():
+        hissing_control.update_current_menu('keyboard')
     menu.add_item('Pick Direction and Move', pick_direction_and_move)
     menu.add_item('Left Click', left_click)
     menu.add_item('Right Click', right_click)
     menu.add_item('Double Click', double_left_click)
     menu.add_item('Toggle Holding Left Click Down', toggle_drag)
     menu.add_item('Scroll', switch_to_scroll_menu)
+    menu.add_item('Keyboard', switch_to_keyboard_menu)
     return menu
 
 def build_scroll_menu(hissing_control):     
@@ -269,7 +273,7 @@ class HissingControl:
         self.mouse_dragger = MouseDragger()
         self.progress_towards_next_action = 0
         self.hissing_active = False
-        self.menus = {'main': build_main_menu(self), 'scroll': build_scroll_menu(self)}
+        self.menus = {'main': build_main_menu(self), 'scroll': build_scroll_menu(self), 'keyboard': create_keyboard_menu(self)}
         self.menu = self.menus['main']
 
     def reset_mode(self):
