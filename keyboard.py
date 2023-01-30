@@ -165,7 +165,7 @@ def create_keyboard_menu(hissing_control):
     v_z = create_single_character_row('vwxyz')
     punctuation = RowItem(
         [KeyBoardItem('.', 'period'), KeyBoardItem(',', 'comma'), KeyBoardItem('?', 'question mark'), KeyBoardItem('!', 'exclamation mark'),
-         KeyBoardItem(':', 'colon'), KeyBoardItem(';', 'semicolon'), KeyBoardItem("'", 'quote'), KeyBoardItem('-', 'dash')],
+         KeyBoardItem(':', 'colon'), KeyBoardItem(';', 'semicolon'), KeyBoardItem('"', 'double quote'), KeyBoardItem("'", 'quote'), KeyBoardItem('-', 'dash')],
         'punctuation'
     )
     editing_enter_tab_space = RowItem(
