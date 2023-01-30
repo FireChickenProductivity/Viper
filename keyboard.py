@@ -172,7 +172,7 @@ def create_keyboard_menu(hissing_control):
         [KeyBoardItem('space'), KeyBoardItem('enter'), KeyBoardItem('tab'), KeyBoardItem('escape'), KeyBoardItem('backspace'), KeyBoardItem('delete'), KeyBoardItem('end enter', 'end-enter')],
         'space enter tab escape editing'
     )
-    symbols = create_single_character_row('+-=*/_@$%^#|()\\~`{}[]', 'symbols')
+    symbols = create_single_character_row('+-=*/_@$%^#|()\\~`{}[]<>', 'symbols')
     digits = create_single_character_row('1234567890')
 
     def return_to_main_menu():
