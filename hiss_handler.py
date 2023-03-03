@@ -209,9 +209,7 @@ def hissing_control_enabled():
 class Actions:
     def fire_chicken_hissing_control_handle_hiss(active: bool):
         ''''''
-        print(hissing_control.get_hissing_active())
         if hissing_start_during_movement_reverses_direction.get() != 0 and active and hissing_control.get_hissing_active() and hissing_control.get_mode() == HissingControlMode.MOVEMENT:
-            print('condition')
             hissing_control.simulate_hissing_change()
             hissing_control.reverse_direction()
             hissing_control.update_mode(HissingControlMode.MOVEMENT)
@@ -451,7 +449,6 @@ class HissingControl:
     
     def reverse_direction(self):
         self.direction += 180
-        print(self.direction)
 
     def display_direction(self):
         self.direction_display.display_direction(self.direction)
