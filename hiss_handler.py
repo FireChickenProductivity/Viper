@@ -8,6 +8,7 @@ from .Dragging import MouseDragger
 from .Menu import Menu
 from .asynchronous_job_scheduling import AsynchronousJobHandler
 from .keyboard import create_keyboard_menu
+from typing import Union
 
 module = Module()
 HISSING_CONTROL_TAG_BASE_NAME = 'fire_chicken_hissing_control'
@@ -129,6 +130,13 @@ hissing_start_time = module.setting(
     desc = 'How long you must hiss in milliseconds before you are considered to have start hissing. Increasing this can reduce false positive hiss recognition.'
 )
 
+hissing_start_during_movement_reverses_direction = module.setting(
+    'fire_chicken_hissing_control_hissing_start_during_movement_reverses_direction',
+    type = int,
+    default = 1,
+    desc = 'If nonzero, starting to hiss during mouse movement reverses the direction'
+)
+
 class OverrideValues:
     def __init__(self, should_increase_direction_on_direction_change = True, movement_delay_override = False, vertical_scrolling_speed_override = False, 
     horizontal_scrolling_speed_override = False, menu_direction_reversed = False):
@@ -170,14 +178,14 @@ class DelayedHissingJobHandler:
         self.job = cron.after(f'{hissing_start_time.get()}ms', self.start_hiss_if_not_canceled)
         
     def start_hiss_if_not_canceled(self):
-        actions.user.fire_chicken_simulate_hissing_change()
+        actions.user.fire_chicken_simulate_hissing_change(True)
         self.hiss_successfully_started = True
         self.job = None
     
     def stop_delayed_hiss(self):
         self.cancel_job()
         if self.hiss_successfully_started:
-            actions.user.fire_chicken_simulate_hissing_change()
+            actions.user.fire_chicken_simulate_hissing_change(False)
             self.hiss_successfully_started = False
     
     def cancel_job(self):
@@ -191,7 +199,7 @@ def on_hiss(active):
         if hissing_start_time.get() > 0:
             delayed_hissing_job_handler.handled_delayed_hiss(active)
         else:
-            actions.user.fire_chicken_simulate_hissing_change()
+            actions.user.fire_chicken_simulate_hissing_change(active)
 
 def hissing_control_enabled():
     tags = scope.get("tag")
@@ -201,14 +209,22 @@ def hissing_control_enabled():
 class Actions:
     def fire_chicken_hissing_control_handle_hiss(active: bool):
         ''''''
-        if active:
-            hissing_control.handle_hiss_start()
+        print(hissing_control.get_hissing_active())
+        if hissing_start_during_movement_reverses_direction.get() != 0 and active and hissing_control.get_hissing_active() and hissing_control.get_mode() == HissingControlMode.MOVEMENT:
+            print('condition')
+            hissing_control.simulate_hissing_change()
+            hissing_control.reverse_direction()
+            hissing_control.update_mode(HissingControlMode.MOVEMENT)
+            hissing_control.simulate_hissing_change()
         else:
-            hissing_control.handle_hiss_ending()
+            hissing_control.simulate_hissing_change()
     
-    def fire_chicken_simulate_hissing_change():
+    def fire_chicken_simulate_hissing_change(active: Union[None, bool] = None):
         ''''''
-        hissing_control.simulate_hissing_change()
+        if active is None:
+            hissing_control.simulate_hissing_change()
+        else:
+            actions.user.fire_chicken_hissing_control_handle_hiss(active)
     
     def fire_chicken_simulate_hissing_change_but_decrease_direction():
         ''''''
@@ -297,7 +313,7 @@ class HissingControl:
         else:
             self.handle_hiss_start(override_values)
 
-    def handle_hiss_start(self, override_values: OverrideValues):
+    def handle_hiss_start(self, override_values: OverrideValues = OverrideValues()):
         self.hissing_active = True
         if self.mode == HissingControlMode.DIRECTION_SELECTION:
             self.start_changing_direction(override_values.should_increase_direction_on_direction_change)
@@ -420,6 +436,12 @@ class HissingControl:
     def get_menu(self):
         return self.menu
     
+    def get_mode(self):
+        return self.mode
+
+    def get_hissing_active(self):
+        return self.hissing_active
+
     def change_direction_by(self, change_in_direction: float):
         if self.direction_editable:
             self.direction += change_in_direction
@@ -427,6 +449,10 @@ class HissingControl:
                 self.direction -= MAXIMUM_ANGLE
             self.display_direction()
     
+    def reverse_direction(self):
+        self.direction += 180
+        print(self.direction)
+
     def display_direction(self):
         self.direction_display.display_direction(self.direction)
 
