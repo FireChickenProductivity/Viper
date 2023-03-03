@@ -128,11 +128,11 @@ class KeyboardMenu:
     def swap_picking_row_versus_column(self):
         self.is_picking_row = not self.is_picking_row
    
-    def select_next_item(self):
+    def select_next_item(self, direction):
         if self.is_picking_row:
-            self.keyboard.select_next_row()
+            self.keyboard.select_next_row(direction)
         else:
-            self.keyboard.select_next_column()
+            self.keyboard.select_next_column(direction)
    
     def reset_selection(self):
         pass
