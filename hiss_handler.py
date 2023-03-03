@@ -224,6 +224,7 @@ def build_main_menu(hissing_control):
     menu = Menu()
     def pick_direction_and_move():
         hissing_control.update_mode(HissingControlMode.DIRECTION_SELECTION)
+        hissing_control.display_direction()
     def left_click():
         actions.mouse_click(0)
         mouse_dragger.stop_dragging()
@@ -355,7 +356,6 @@ class HissingControl:
         hissing_control.update_current_menu('main')
 
     def start_changing_direction(self, should_increase_direction_on_direction_change):
-        self.display_direction()
         self.unlock_direction()
         if should_increase_direction_on_direction_change:
             self.start_increasing_direction()
