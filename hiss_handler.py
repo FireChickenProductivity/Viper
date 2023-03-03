@@ -115,6 +115,13 @@ pop_horizontal_scroll_amount = module.setting(
     desc = 'How quickly to scroll horizontally with the fire chicken hissing control with pop input'
 )
 
+pop_reverses_menu_direction = module.setting(
+    'fire_chicken_hissing_control_pop_reverses_menu',
+    type = int,
+    default = 1,
+    desc = 'When set to anything other than 0, popping interactions with menus have reversed direction'
+)
+
 hissing_start_time = module.setting(
     'fire_chicken_hissing_control_hissing_start_time',
     type = int,
@@ -124,11 +131,12 @@ hissing_start_time = module.setting(
 
 class OverrideValues:
     def __init__(self, should_increase_direction_on_direction_change = True, movement_delay_override = False, vertical_scrolling_speed_override = False, 
-    horizontal_scrolling_speed_override = False):
+    horizontal_scrolling_speed_override = False, menu_direction_reversed = False):
         self.should_increase_direction_on_direction_change = should_increase_direction_on_direction_change
         self.movement_delay_override = movement_delay_override
         self.vertical_scrolling_speed_override = vertical_scrolling_speed_override
         self.horizontal_scrolling_speed_override = horizontal_scrolling_speed_override
+        self.menu_direction_reversed = menu_direction_reversed
 
 def should_simulate_hiss_with_pop():
     return simulate_hiss_with_pop.get() != 0
@@ -137,7 +145,8 @@ def compute_pop_override_values():
     values = OverrideValues(
         movement_delay_override = pop_mouse_movement_delay.get(),
             vertical_scrolling_speed_override = pop_vertical_scroll_amount.get(),
-            horizontal_scrolling_speed_override = pop_horizontal_scroll_amount.get()
+            horizontal_scrolling_speed_override = pop_horizontal_scroll_amount.get(),
+            menu_direction_reversed = pop_reverses_menu_direction.get() != 0,
     )
     return values
 
@@ -294,7 +303,7 @@ class HissingControl:
         elif self.mode == HissingControlMode.MOVEMENT:
             self.start_moving_mouse(override_values.movement_delay_override)
         elif self.should_select_action():
-            self.start_increasing_progress_towards_next_action()
+            self.start_increasing_progress_towards_next_action(override_values.menu_direction_reversed)
         elif self.mode == HissingControlMode.SCROLLING:
             self.start_scrolling(override_values.vertical_scrolling_speed_override, override_values.horizontal_scrolling_speed_override)
 
@@ -375,9 +384,9 @@ class HissingControl:
         self.update_mode(HissingControlMode.MOVEMENT)
         cron.after(f'{direction_change_delay.get()*2}ms', self.direction_display.hide)
 
-    def start_increasing_progress_towards_next_action(self):
+    def start_increasing_progress_towards_next_action(self, direction_reversed):
         def make_progress_towards_next_action():
-            self.increase_progress_towards_next_action()
+            self.increase_progress_towards_next_action(direction_reversed)
         self.job_handler.start_job(make_progress_towards_next_action, next_action_progress_delay.get())
         gui.show()
 
@@ -388,11 +397,14 @@ class HissingControl:
         self.menu.pick_current_item()
         self.menu.reset_selection()
 
-    def increase_progress_towards_next_action(self):
+    def increase_progress_towards_next_action(self, direction_reversed):
         self.progress_towards_next_action += 1
+        menu_change_value = 1
+        if direction_reversed:
+            menu_change_value = -1
         if self.progress_towards_next_action >= next_action_progress_needed.get():
             self.progress_towards_next_action = 0
-            self.menu.select_next_item()
+            self.menu.select_next_item(menu_change_value)
 
     def update_mode(self, mode):
         self.mode = mode

@@ -10,7 +10,7 @@ class KeyBoardItem:
         self.display_name = display_name
         if display_name is None:
             self.display_name = self.key_name
-    
+   
     def get_display_name(self):
         return self.display_name
 
@@ -18,19 +18,19 @@ class RowItem:
     def __init__(self, keyboard_items, display_name):
         self.keyboard_items = keyboard_items
         self.display_name = display_name
-    
+   
     def get_item(self, index):
         return self.keyboard_items[index]
-    
+   
     def get_items(self):
         return self.keyboard_items
-    
+   
     def compute_length(self):
         return len(self.keyboard_items)
-    
+   
     def get_display_name(self):
         return self.display_name
-    
+   
     def is_individual_item(self):
         return False
 
@@ -42,7 +42,7 @@ class KeyBoard:
         self.current_row = 0
         self.current_column = 0
         self.last_keystroke = ''
-    
+   
     def set_rows(self, rows):
         self.rows = rows
         self.reset_selection()
@@ -50,7 +50,7 @@ class KeyBoard:
     def pick_current_key(self):
         key: KeyBoardItem = self.get_current_key()
         self.add_key_to_keystroke(key)
-        if KeyBoard.should_start_keystroke(key): 
+        if KeyBoard.should_start_keystroke(key):
             self.perform_current_keystroke()
         self.reset_selection()
 
@@ -73,35 +73,35 @@ class KeyBoard:
             self.last_keystroke = self.current_keystroke
             self.current_keystroke = ''
    
-    def select_next_column(self):
-        self.current_column += 1
-        if self.rows[self.current_row].compute_length() <= self.current_column:
-            self.current_column = 0
+    def select_next_column(self, direction: int = 1):
+        # if direction = 1 move down if -1 move up
+        self.current_column = (self.current_column + direction) % self.rows[self.current_row].compute_length()
 
-    def select_next_row(self):
-        self.current_row += 1
-        if len(self.rows) <= self.current_row:
-            self.current_row = 0
-    
+
+    def select_next_row(self, direction: int = 1):
+        # if direction = 1 move down if -1 move up
+        self.current_row = (self.current_row + direction) % len(self.rows)
+
+   
     def get_current_row(self):
         return self.current_row
-    
+   
     def get_current_column(self):
         return self.current_column
 
     def get_current_column_items(self):
         items = self.rows[self.current_row].get_items()
         return items
-    
+   
     def get_current_row_items(self):
         return self.rows
-    
+   
     def pick_current_single_item_row(self):
         self.rows[self.current_row].pick_item()
 
     def is_on_single_item_row(self):
         return self.rows[self.current_row].is_individual_item()
-    
+   
     def reset_selection(self):
         self.current_row = 0
         self.current_column = 0
@@ -113,7 +113,7 @@ class KeyboardMenu:
     def __init__(self, keyboard: KeyBoard):
         self.keyboard = keyboard
         self.is_picking_row = True
-    
+   
     def pick_current_item(self):
         if self.keyboard.is_on_single_item_row():
             self.keyboard.pick_current_single_item_row()
@@ -127,21 +127,21 @@ class KeyboardMenu:
 
     def swap_picking_row_versus_column(self):
         self.is_picking_row = not self.is_picking_row
-    
-    def select_next_item(self):
+   
+    def select_next_item(self, direction):
         if self.is_picking_row:
-            self.keyboard.select_next_row()
+            self.keyboard.select_next_row(direction)
         else:
-            self.keyboard.select_next_column()
-    
+            self.keyboard.select_next_column(direction)
+   
     def reset_selection(self):
         pass
-    
+   
     def get_items(self):
         if self.is_picking_row:
             return self.keyboard.get_current_row_items()
         return self.keyboard.get_current_column_items()
-        
+       
     def get_current_item_number(self):
         if self.is_picking_row:
             return self.keyboard.get_current_row()
@@ -180,7 +180,7 @@ def create_keyboard_menu(hissing_control):
         hissing_control.reset_mode()
     close_menu_item = MenuItem('close keyboard', return_to_main_menu)
     repeat_last_keystroke_item = MenuItem('repeat last keystroke', keyboard.repeat_last_keystroke)
-    
+   
     keyboard.set_rows([repeat_last_keystroke_item, modifier_keys, a_f, g_k, l_p, q_u, v_z, punctuation, digits, editing_enter_tab_space, movement_keys, symbols, close_menu_item])
     menu = KeyboardMenu(keyboard)
     return menu
