@@ -370,6 +370,7 @@ class HissingControl:
         hissing_control.update_current_menu('main')
 
     def start_changing_direction(self, should_increase_direction_on_direction_change):
+        self.display_direction()
         self.unlock_direction()
         if should_increase_direction_on_direction_change:
             self.start_increasing_direction()
