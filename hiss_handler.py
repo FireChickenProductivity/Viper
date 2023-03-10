@@ -123,6 +123,13 @@ pop_reverses_menu_direction = module.setting(
     desc = 'When set to anything other than 0, popping interactions with menus have reversed direction'
 )
 
+pop_reverses_direction_during_direction_change = module.setting(
+    'fire_chicken_hissing_control_pop_reverses_direction_during_direction_change',
+    type = int,
+    default = 1,
+    desc = 'When set to anything other than 0, popping during direction selection reverses direction'
+)
+
 hissing_start_time = module.setting(
     'fire_chicken_hissing_control_hissing_start_time',
     type = int,
@@ -152,9 +159,10 @@ def should_simulate_hiss_with_pop():
 def compute_pop_override_values():
     values = OverrideValues(
         movement_delay_override = pop_mouse_movement_delay.get(),
-            vertical_scrolling_speed_override = pop_vertical_scroll_amount.get(),
-            horizontal_scrolling_speed_override = pop_horizontal_scroll_amount.get(),
-            menu_direction_reversed = pop_reverses_menu_direction.get() != 0,
+        vertical_scrolling_speed_override = pop_vertical_scroll_amount.get(),
+        horizontal_scrolling_speed_override = pop_horizontal_scroll_amount.get(),
+        menu_direction_reversed = pop_reverses_menu_direction.get() != 0,
+        should_increase_direction_on_direction_change = pop_reverses_direction_during_direction_change.get() == 0,
     )
     return values
 
