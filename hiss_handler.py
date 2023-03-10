@@ -263,38 +263,53 @@ class Actions:
     def fire_chicken_hissing_control_hide_display():
         ''''''
         hissing_control.hide_direction_display()
+    
+    def fire_chicken_hissing_control_pick_direction_and_move():
+        ''''''
+        hissing_control.update_mode(HissingControlMode.DIRECTION_SELECTION)
+        hissing_control.display_direction()
+    
+    def fire_chicken_hissing_control_toggle_drag():
+        ''''''
+        mouse_dragger.toggle_drag()
+    
+    def fire_chicken_hissing_control_left_click():
+        ''''''
+        actions.mouse_click(0)
+        mouse_dragger.stop_dragging()
+    
+    def fire_chicken_hissing_control_right_click():
+        ''''''
+        actions.mouse_click(1)
+        mouse_dragger.stop_dragging()
+    
+    def fire_chicken_hissing_control_double_left_click():
+        ''''''
+        actions.mouse_click(0)
+        actions.mouse_click(0)
+        mouse_dragger.stop_dragging()
+    
+    def fire_chicken_hissing_control_activate_scrolling_menu():
+        ''''''
+        hissing_control.update_current_menu('scroll')
+    
+    def fire_chicken_hissing_control_activate_keyboard_menu():
+        ''''''
+        hissing_control.update_current_menu('keyboard')
+        hissing_control.update_mode(HissingControlMode.KEYBOARD)
 
 mouse_dragger = MouseDragger()
 
-def build_main_menu(hissing_control):
+def build_main_menu():
     menu = Menu()
-    def pick_direction_and_move():
-        hissing_control.update_mode(HissingControlMode.DIRECTION_SELECTION)
-        hissing_control.display_direction()
-    def left_click():
-        actions.mouse_click(0)
-        mouse_dragger.stop_dragging()
-    def right_click():
-        actions.mouse_click(1)
-        mouse_dragger.stop_dragging()
-    def double_left_click():
-        actions.mouse_click(0)
-        actions.mouse_click(0)
-        mouse_dragger.stop_dragging()
-    def toggle_drag():
-        mouse_dragger.toggle_drag()
-    def switch_to_scroll_menu():
-        hissing_control.update_current_menu('scroll')
-    def switch_to_keyboard_menu():
-        hissing_control.update_current_menu('keyboard')
-        hissing_control.update_mode(HissingControlMode.KEYBOARD)
-    menu.add_item('Pick Direction and Move', pick_direction_and_move)
-    menu.add_item('Left Click', left_click)
-    menu.add_item('Right Click', right_click)
-    menu.add_item('Double Click', double_left_click)
-    menu.add_item('Toggle Holding Left Click Down', toggle_drag)
-    menu.add_item('Scroll', switch_to_scroll_menu)
-    menu.add_item('Keyboard', switch_to_keyboard_menu)
+
+    menu.add_item('Pick Direction and Move', actions.user.fire_chicken_hissing_control_pick_direction_and_move)
+    menu.add_item('Left Click', actions.user.fire_chicken_hissing_control_left_click)
+    menu.add_item('Right Click', actions.user.fire_chicken_hissing_control_right_click)
+    menu.add_item('Double Click', actions.user.fire_chicken_hissing_control_double_left_click)
+    menu.add_item('Toggle Holding Left Click Down', actions.user.fire_chicken_hissing_control_toggle_drag)
+    menu.add_item('Scroll', actions.user.fire_chicken_hissing_control_activate_scrolling_menu)
+    menu.add_item('Keyboard', actions.user.fire_chicken_hissing_control_activate_keyboard_menu)
     return menu
 
 def build_scroll_menu(hissing_control):     
@@ -331,7 +346,7 @@ class HissingControl:
         self.mouse_dragger = MouseDragger()
         self.progress_towards_next_action = 0
         self.hissing_active = False
-        self.menus = {'main': build_main_menu(self), 'scroll': build_scroll_menu(self), 'keyboard': create_keyboard_menu(self)}
+        self.menus = {'main': build_main_menu(), 'scroll': build_scroll_menu(self), 'keyboard': create_keyboard_menu(self)}
         self.menu = self.menus['main']
 
     def reset_mode(self):
