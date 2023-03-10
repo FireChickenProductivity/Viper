@@ -249,6 +249,20 @@ class Actions:
     def fire_chicken_hissing_control_stop_changing_direction():
         ''''''
         hissing_control.stop_changing_direction()
+    
+    def fire_chicken_hissing_control_change_direction_by(degrees: int):
+        ''''''
+        hissing_control.unlock_direction()
+        hissing_control.change_direction_by(degrees)
+        hissing_control.lock_direction()
+    
+    def fire_chicken_hissing_control_update_mode(mode: str):
+        ''''''
+        hissing_control.update_mode(HissingControlMode[mode])
+    
+    def fire_chicken_hissing_control_hide_display():
+        ''''''
+        hissing_control.hide_direction_display()
 
 mouse_dragger = MouseDragger()
 
@@ -415,6 +429,9 @@ class HissingControl:
         self.lock_direction()
         self.job_handler.stop_job()
         self.update_mode(HissingControlMode.MOVEMENT)
+        self.hide_direction_display()
+    
+    def hide_direction_display(self):
         cron.after(f'{direction_change_delay.get()*2}ms', self.direction_display.hide)
 
     def start_increasing_progress_towards_next_action(self, direction_reversed):
