@@ -297,6 +297,11 @@ class Actions:
         ''''''
         hissing_control.update_current_menu('keyboard')
         hissing_control.update_mode(HissingControlMode.KEYBOARD)
+    
+    def fire_chicken_hissing_control_left_click_if_hissing_active():
+        ''''''
+        if hissing_control.get_hissing_active():
+            actions.user.fire_chicken_hissing_control_left_click()
 
 mouse_dragger = MouseDragger()
 
