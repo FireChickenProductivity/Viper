@@ -219,7 +219,7 @@ class Actions:
         ''''''
         if hissing_start_during_movement_reverses_direction.get() != 0 and active and hissing_control.get_hissing_active() and hissing_control.get_mode() == HissingControlMode.MOVEMENT:
             hissing_control.simulate_hissing_change()
-            hissing_control.reverse_direction()
+            direction_handler.reverse_direction()
             hissing_control.update_mode(HissingControlMode.MOVEMENT)
             hissing_control.simulate_hissing_change()
         else:
@@ -242,19 +242,19 @@ class Actions:
     
     def fire_chicken_hissing_control_reverse_direction():
         ''''''
-        hissing_control.reverse_direction()
+        direction_handler.reverse_direction()
         if hissing_control.get_mode() == HissingControlMode.DIRECTION_SELECTION:
-            hissing_control.display_direction()
+            direction_handler.display_direction()
     
     def fire_chicken_hissing_control_stop_changing_direction():
         ''''''
-        hissing_control.stop_changing_direction()
+        direction_handler.stop_changing_direction()
     
     def fire_chicken_hissing_control_change_direction_by(degrees: int):
         ''''''
-        hissing_control.unlock_direction()
-        hissing_control.change_direction_by(degrees)
-        hissing_control.lock_direction()
+        direction_handler.unlock_direction()
+        direction_handler.change_direction_by(degrees)
+        direction_handler.lock_direction()
     
     def fire_chicken_hissing_control_update_mode(mode: str):
         ''''''
@@ -262,12 +262,12 @@ class Actions:
     
     def fire_chicken_hissing_control_hide_display():
         ''''''
-        hissing_control.hide_direction_display()
+        direction_handler.hide_direction_display()
     
     def fire_chicken_hissing_control_pick_direction_and_move():
         ''''''
         hissing_control.update_mode(HissingControlMode.DIRECTION_SELECTION)
-        hissing_control.display_direction()
+        direction_handler.display_direction()
     
     def fire_chicken_hissing_control_toggle_drag():
         ''''''
@@ -334,87 +334,12 @@ def build_scroll_menu(hissing_control):
 MAXIMUM_ANGLE = 360
 SCROLLING_DELAY_IN_MILLISECONDS = 50
 
-class HissingControl:
+class DirectionHandler:
     def __init__(self):
-        self.reset_mode()
         self.direction = 0
         self.direction_editable = False
-        self.vertical_scroll_amount = 0
-        self.horizontal_scroll_amount = 0
-        self.job_handler = AsynchronousJobHandler()
         self.direction_display = DirectionDisplay()
-        self.mouse_dragger = MouseDragger()
-        self.progress_towards_next_action = 0
-        self.hissing_active = False
-        self.menus = {'main': build_main_menu(), 'scroll': build_scroll_menu(self), 'keyboard': create_keyboard_menu(self)}
-        self.menu = self.menus['main']
-
-    def reset_mode(self):
-        self.update_mode(HissingControlMode.ACTION_SELECTION)
-
-    def simulate_hissing_change(self, override_values: OverrideValues = OverrideValues()):
-        if self.hissing_active:
-            self.handle_hiss_ending()
-        else:
-            self.handle_hiss_start(override_values)
-
-    def handle_hiss_start(self, override_values: OverrideValues = OverrideValues()):
-        self.hissing_active = True
-        if self.mode == HissingControlMode.DIRECTION_SELECTION:
-            self.start_changing_direction(override_values.should_increase_direction_on_direction_change)
-        elif self.mode == HissingControlMode.MOVEMENT:
-            self.start_moving_mouse(override_values.movement_delay_override)
-        elif self.should_select_action():
-            self.start_increasing_progress_towards_next_action(override_values.menu_direction_reversed)
-        elif self.mode == HissingControlMode.SCROLLING:
-            self.start_scrolling(override_values.vertical_scrolling_speed_override, override_values.horizontal_scrolling_speed_override)
-
-    def handle_hiss_ending(self):
-        self.hissing_active = False
-        if self.mode == HissingControlMode.DIRECTION_SELECTION:
-            self.stop_changing_direction()
-        elif self.mode == HissingControlMode.MOVEMENT:
-            self.stop_moving_mouse()
-        elif self.should_select_action():
-            self.stop_increasing_progress_towards_next_action()
-        elif self.mode == HissingControlMode.SCROLLING:
-            self.stop_scrolling()
-
-    def should_select_action(self):
-        return self.mode in [HissingControlMode.ACTION_SELECTION, HissingControlMode.KEYBOARD]
-
-    def start_moving_mouse(self, movement_delay_override):
-        delay_amount = mouse_movement_delay.get()
-        if movement_delay_override:
-            delay_amount = movement_delay_override
-        def move_mouse():
-            mouse_position_change: MousePosition = compute_mouse_position_with_direction_and_magnitude(self.get_direction(), movement_amount.get())
-            change_mouse_position_by(mouse_position_change)
-        self.job_handler.start_job(move_mouse, delay_amount)
-
-    def stop_moving_mouse(self):
-        self.job_handler.stop_job()
-        self.reset_mode()
-    
-    def start_scrolling(self, vertical_scrolling_speed_override, horizontal_scrolling_speed_override):
-        vertical_scroll_amount = self.vertical_scroll_amount
-        horizontal_scroll_amount = self.horizontal_scroll_amount
-        if vertical_scrolling_speed_override:
-            vertical_scroll_amount = compute_scrolling_amount_override(vertical_scroll_amount, vertical_scrolling_speed_override)
-        if horizontal_scrolling_speed_override:
-            horizontal_scroll_amount = compute_scrolling_amount_override(horizontal_scroll_amount, horizontal_scrolling_speed_override)
-        def scroll():
-            actions.mouse_scroll(vertical_scroll_amount, horizontal_scroll_amount)
-        self.job_handler.start_job(scroll, SCROLLING_DELAY_IN_MILLISECONDS)
-
-    def set_horizontal_and_vertical_scroll_amounts(self, vertical: int, horizontal: int):
-        self.vertical_scroll_amount = vertical
-        self.horizontal_scroll_amount = horizontal
-
-    def stop_scrolling(self):
-        self.job_handler.stop_job()
-        self.reset_mode()
-        hissing_control.update_current_menu('main')
+        self.job_handler = AsynchronousJobHandler()
 
     def start_changing_direction(self, should_increase_direction_on_direction_change):
         self.display_direction()
@@ -443,11 +368,106 @@ class HissingControl:
     def stop_changing_direction(self):
         self.lock_direction()
         self.job_handler.stop_job()
-        self.update_mode(HissingControlMode.MOVEMENT)
         self.hide_direction_display()
     
     def hide_direction_display(self):
         cron.after(f'{direction_change_delay.get()*2}ms', self.direction_display.hide)
+    
+    def get_direction(self):
+        return self.direction
+    
+    def change_direction_by(self, change_in_direction: float):
+        if self.direction_editable:
+            self.direction += change_in_direction
+            while self.direction > MAXIMUM_ANGLE:
+                self.direction -= MAXIMUM_ANGLE
+            self.display_direction()
+    
+    def reverse_direction(self):
+        self.direction += 180
+
+    def display_direction(self):
+        self.direction_display.display_direction(self.direction)
+
+class HissingControl:
+    def __init__(self):
+        self.reset_mode()
+        self.vertical_scroll_amount = 0
+        self.horizontal_scroll_amount = 0
+        self.job_handler = AsynchronousJobHandler()
+        self.mouse_dragger = MouseDragger()
+        self.progress_towards_next_action = 0
+        self.hissing_active = False
+        self.menus = {'main': build_main_menu(), 'scroll': build_scroll_menu(self), 'keyboard': create_keyboard_menu(self)}
+        self.menu = self.menus['main']
+
+    def reset_mode(self):
+        self.update_mode(HissingControlMode.ACTION_SELECTION)
+
+    def simulate_hissing_change(self, override_values: OverrideValues = OverrideValues()):
+        if self.hissing_active:
+            self.handle_hiss_ending()
+        else:
+            self.handle_hiss_start(override_values)
+
+    def handle_hiss_start(self, override_values: OverrideValues = OverrideValues()):
+        self.hissing_active = True
+        if self.mode == HissingControlMode.DIRECTION_SELECTION:
+            direction_handler.start_changing_direction(override_values.should_increase_direction_on_direction_change)
+        elif self.mode == HissingControlMode.MOVEMENT:
+            self.start_moving_mouse(override_values.movement_delay_override)
+        elif self.should_select_action():
+            self.start_increasing_progress_towards_next_action(override_values.menu_direction_reversed)
+        elif self.mode == HissingControlMode.SCROLLING:
+            self.start_scrolling(override_values.vertical_scrolling_speed_override, override_values.horizontal_scrolling_speed_override)
+
+    def handle_hiss_ending(self):
+        self.hissing_active = False
+        if self.mode == HissingControlMode.DIRECTION_SELECTION:
+            direction_handler.stop_changing_direction()
+            self.update_mode(HissingControlMode.MOVEMENT)
+        elif self.mode == HissingControlMode.MOVEMENT:
+            self.stop_moving_mouse()
+        elif self.should_select_action():
+            self.stop_increasing_progress_towards_next_action()
+        elif self.mode == HissingControlMode.SCROLLING:
+            self.stop_scrolling()
+
+    def should_select_action(self):
+        return self.mode in [HissingControlMode.ACTION_SELECTION, HissingControlMode.KEYBOARD]
+
+    def start_moving_mouse(self, movement_delay_override):
+        delay_amount = mouse_movement_delay.get()
+        if movement_delay_override:
+            delay_amount = movement_delay_override
+        def move_mouse():
+            mouse_position_change: MousePosition = compute_mouse_position_with_direction_and_magnitude(direction_handler.get_direction(), movement_amount.get())
+            change_mouse_position_by(mouse_position_change)
+        self.job_handler.start_job(move_mouse, delay_amount)
+
+    def stop_moving_mouse(self):
+        self.job_handler.stop_job()
+        self.reset_mode()
+    
+    def start_scrolling(self, vertical_scrolling_speed_override, horizontal_scrolling_speed_override):
+        vertical_scroll_amount = self.vertical_scroll_amount
+        horizontal_scroll_amount = self.horizontal_scroll_amount
+        if vertical_scrolling_speed_override:
+            vertical_scroll_amount = compute_scrolling_amount_override(vertical_scroll_amount, vertical_scrolling_speed_override)
+        if horizontal_scrolling_speed_override:
+            horizontal_scroll_amount = compute_scrolling_amount_override(horizontal_scroll_amount, horizontal_scrolling_speed_override)
+        def scroll():
+            actions.mouse_scroll(vertical_scroll_amount, horizontal_scroll_amount)
+        self.job_handler.start_job(scroll, SCROLLING_DELAY_IN_MILLISECONDS)
+
+    def set_horizontal_and_vertical_scroll_amounts(self, vertical: int, horizontal: int):
+        self.vertical_scroll_amount = vertical
+        self.horizontal_scroll_amount = horizontal
+
+    def stop_scrolling(self):
+        self.job_handler.stop_job()
+        self.reset_mode()
+        hissing_control.update_current_menu('main')
 
     def start_increasing_progress_towards_next_action(self, direction_reversed):
         def make_progress_towards_next_action():
@@ -478,9 +498,6 @@ class HissingControl:
     
     def update_current_menu(self, name: str):
         self.menu = self.menus[name]
-
-    def get_direction(self):
-        return self.direction
     
     def get_menu(self):
         return self.menu
@@ -491,18 +508,6 @@ class HissingControl:
     def get_hissing_active(self):
         return self.hissing_active
 
-    def change_direction_by(self, change_in_direction: float):
-        if self.direction_editable:
-            self.direction += change_in_direction
-            while self.direction > MAXIMUM_ANGLE:
-                self.direction -= MAXIMUM_ANGLE
-            self.display_direction()
-    
-    def reverse_direction(self):
-        self.direction += 180
-
-    def display_direction(self):
-        self.direction_display.display_direction(self.direction)
 
 def compute_scrolling_amount_override(original: int, override: int):
     if abs(original) > 0:
@@ -533,6 +538,7 @@ class DirectionDisplay:
     def hide(self):
         self.display.hide()
 
+direction_handler = DirectionHandler()
 hissing_control = HissingControl()
 
 @imgui.open()
