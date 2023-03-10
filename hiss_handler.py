@@ -400,7 +400,6 @@ class HissingControl:
         self.vertical_scroll_amount = 0
         self.horizontal_scroll_amount = 0
         self.job_handler = AsynchronousJobHandler()
-        self.mouse_dragger = MouseDragger()
         self.progress_towards_next_action = 0
         self.hissing_active = False
         self.menus = {'main': build_main_menu(), 'scroll': build_scroll_menu(self), 'keyboard': create_keyboard_menu(self)}
