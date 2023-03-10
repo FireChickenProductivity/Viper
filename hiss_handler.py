@@ -239,6 +239,16 @@ class Actions:
     def fire_chicken_simulate_hissing_change_with_overridden_movement_delay(movement_delay: int):
         ''''''
         hissing_control.simulate_hissing_change(OverrideValues(movement_delay_override = movement_delay))
+    
+    def fire_chicken_hissing_control_reverse_direction():
+        ''''''
+        hissing_control.reverse_direction()
+        if hissing_control.get_mode() == HissingControlMode.DIRECTION_SELECTION:
+            hissing_control.display_direction()
+    
+    def fire_chicken_hissing_control_stop_changing_direction():
+        ''''''
+        hissing_control.stop_changing_direction()
 
 mouse_dragger = MouseDragger()
 
