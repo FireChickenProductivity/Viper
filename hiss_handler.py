@@ -21,9 +21,6 @@ module.tag(HISSING_CONTROL_TAG_BASE_NAME + '_scrolling', desc = 'Active when his
 module.tag(HISSING_CONTROL_TAG_BASE_NAME + '_keyboard', desc = 'Active with the fire chicken hissing keyboard control')
 HISSING_CONTROL_MODE_TAG_PREFIX = 'user.' + HISSING_CONTROL_TAG_BASE_NAME + '_'
 
-CUSTOMIZATION_DIRECTORY = os.path.join(actions.path.talon_user(), 'Viper Settings')
-CUSTOM_MENU_DIRECTORY = os.path.join(CUSTOMIZATION_DIRECTORY, 'Custom Menus')
-
 hissing_mode_context = Context()
 def update_hissing_mode_context(mode):
     global hissing_mode_context
@@ -560,7 +557,13 @@ def gui(gui: imgui.GUI):
         if is_current_item:
             gui.line()
 
+CUSTOMIZATION_DIRECTORY = None
+CUSTOM_MENU_DIRECTORY = None
+
 def on_ready():
+    global CUSTOMIZATION_DIRECTORY, CUSTOM_MENU_DIRECTORY
+    CUSTOMIZATION_DIRECTORY = os.path.join(actions.path.talon_user(), 'Viper Settings')
+    CUSTOM_MENU_DIRECTORY = os.path.join(CUSTOMIZATION_DIRECTORY, 'Custom Menus')
     noise.register("hiss", on_hiss)
     noise.register("pop", on_pop)
 app.register("ready", on_ready)
