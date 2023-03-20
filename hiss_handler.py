@@ -9,6 +9,7 @@ from .Menu import Menu
 from .asynchronous_job_scheduling import AsynchronousJobHandler
 from .keyboard import create_keyboard_menu
 from typing import Union
+import os
 
 module = Module()
 HISSING_CONTROL_TAG_BASE_NAME = 'fire_chicken_hissing_control'
@@ -19,6 +20,9 @@ module.tag(HISSING_CONTROL_TAG_BASE_NAME + '_movement', desc = 'Active when hiss
 module.tag(HISSING_CONTROL_TAG_BASE_NAME + '_scrolling', desc = 'Active when hissing scrolls through the fire chicken hissing control')
 module.tag(HISSING_CONTROL_TAG_BASE_NAME + '_keyboard', desc = 'Active with the fire chicken hissing keyboard control')
 HISSING_CONTROL_MODE_TAG_PREFIX = 'user.' + HISSING_CONTROL_TAG_BASE_NAME + '_'
+
+CUSTOMIZATION_DIRECTORY = os.path.join(actions.path.talon_user(), 'Viper Settings')
+CUSTOM_MENU_DIRECTORY = os.path.join(CUSTOMIZATION_DIRECTORY, 'Custom Menus')
 
 hissing_mode_context = Context()
 def update_hissing_mode_context(mode):
