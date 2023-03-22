@@ -1,3 +1,6 @@
+import csv
+from talon import actions
+
 class Menu:
     def __init__(self, menu_items = None):
         self.menu_items = menu_items
@@ -39,3 +42,13 @@ class MenuItem:
 
     def is_individual_item(self):
         return True
+
+#Function provided by WhatIV
+def compute_menu_from_csv(file_name):
+    csv_Menu = Menu()
+    with open(file_name) as menu_file:
+        menu_info = csv.reader(menu_file)
+        for item in menu_info:
+            csv_Menu.add_item(item[0],getattr(actions,item[1]))
+
+    return csv_Menu
