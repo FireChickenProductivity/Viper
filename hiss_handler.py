@@ -5,7 +5,7 @@ from .mouse_position_manipulation import change_mouse_position_by, compute_mouse
 from .direction_display import SingleLineDisplay
 from .fire_chicken import tag_utilities, path_utilities
 from .Dragging import MouseDragger
-from .Menu import Menu
+from .Menu import Menu, compute_menu_from_csv
 from .asynchronous_job_scheduling import AsynchronousJobHandler
 from .keyboard import create_keyboard_menu
 from typing import Union
@@ -411,7 +411,8 @@ class HissingControl:
         self.progress_towards_next_action = 0
         self.hissing_active = False
         self.menus = {'main': build_main_menu(), 'scroll': build_scroll_menu(self), 'keyboard': create_keyboard_menu(self)}
-        self.menu = self.menus['main']
+        self.custom_menu_name = ''
+        self.update_current_menu('main')
 
     def reset_mode(self):
         self.update_mode(HissingControlMode.ACTION_SELECTION)
@@ -509,7 +510,14 @@ class HissingControl:
         update_hissing_mode_context(tag_name)
     
     def update_current_menu(self, name: str):
-        self.menu = self.menus[name]
+        if name == 'main' and main_menu_override.get() != '' and self.custom_menu_name != main_menu_override.get():
+            try:
+                self.menu = compute_menu_from_csv(os.path.join(CUSTOM_MENU_DIRECTORY, main_menu_override.get() + '.csv'))
+                self.custom_menu_name = name
+            except:
+                self.menu = self.menus['main']
+        else:
+            self.menu = self.menus[name]
     
     def get_menu(self):
         return self.menu
