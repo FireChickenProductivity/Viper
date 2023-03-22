@@ -412,6 +412,7 @@ class HissingControl:
         self.hissing_active = False
         self.menus = {'main': build_main_menu(), 'scroll': build_scroll_menu(self), 'keyboard': create_keyboard_menu(self)}
         self.custom_menu_name = ''
+        self.current_menu_name = ''
         self.update_current_menu('main')
 
     def reset_mode(self):
@@ -424,6 +425,7 @@ class HissingControl:
             self.handle_hiss_start(override_values)
 
     def handle_hiss_start(self, override_values: OverrideValues = OverrideValues()):
+        self.refresh_menu()
         self.hissing_active = True
         if self.mode == HissingControlMode.DIRECTION_SELECTION:
             direction_handler.start_changing_direction(override_values.should_increase_direction_on_direction_change)
@@ -509,7 +511,11 @@ class HissingControl:
         tag_name = HISSING_CONTROL_MODE_TAG_PREFIX + mode.name.lower()
         update_hissing_mode_context(tag_name)
     
+    def refresh_menu(self):
+        self.update_current_menu(self.current_menu_name)
+
     def update_current_menu(self, name: str):
+        self.current_menu_name = name
         if name == 'main' and main_menu_override.get() != '' and self.custom_menu_name != main_menu_override.get():
             try:
                 self.menu = compute_menu_from_csv(os.path.join(CUSTOM_MENU_DIRECTORY, main_menu_override.get() + '.csv'))
