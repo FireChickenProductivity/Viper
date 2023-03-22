@@ -145,6 +145,13 @@ hissing_start_during_movement_reverses_direction = module.setting(
     desc = 'If nonzero, starting to hiss during mouse movement reverses the direction'
 )
 
+main_menu_override = module.setting(
+    'fire_chicken_hissing_control_main_menu_override',
+    type = str,
+    default = '',
+    desc = 'When not the empty string, overrides the main menu with the specified custom menu'
+)
+
 class OverrideValues:
     def __init__(self, should_increase_direction_on_direction_change = True, movement_delay_override = False, vertical_scrolling_speed_override = False, 
     horizontal_scrolling_speed_override = False, menu_direction_reversed = False):
