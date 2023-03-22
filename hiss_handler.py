@@ -3,7 +3,7 @@ from enum import Enum
 from .fire_chicken.mouse_position import MousePosition
 from .mouse_position_manipulation import change_mouse_position_by, compute_mouse_position_with_direction_and_magnitude
 from .direction_display import SingleLineDisplay
-from .fire_chicken import tag_utilities
+from .fire_chicken import tag_utilities, path_utilities
 from .Dragging import MouseDragger
 from .Menu import Menu
 from .asynchronous_job_scheduling import AsynchronousJobHandler
@@ -564,6 +564,8 @@ def on_ready():
     global CUSTOMIZATION_DIRECTORY, CUSTOM_MENU_DIRECTORY
     CUSTOMIZATION_DIRECTORY = os.path.join(actions.path.talon_user(), 'Viper Settings')
     CUSTOM_MENU_DIRECTORY = os.path.join(CUSTOMIZATION_DIRECTORY, 'Custom Menus')
+    path_utilities.create_directory_if_nonexistent(CUSTOMIZATION_DIRECTORY)
+    path_utilities.create_directory_if_nonexistent(CUSTOM_MENU_DIRECTORY)
     noise.register("hiss", on_hiss)
     noise.register("pop", on_pop)
 app.register("ready", on_ready)
