@@ -323,6 +323,7 @@ def build_main_menu():
     menu.add_item('Toggle Holding Left Click Down', actions.user.fire_chicken_hissing_control_toggle_drag)
     menu.add_item('Scroll', actions.user.fire_chicken_hissing_control_activate_scrolling_menu)
     menu.add_item('Keyboard', actions.user.fire_chicken_hissing_control_activate_keyboard_menu)
+    menu.add_item('Sleep', actions.speech.disable)
     return menu
 
 def build_scroll_menu(hissing_control):     
