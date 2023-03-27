@@ -519,10 +519,10 @@ class HissingControl:
         if name == 'main' and main_menu_override.get() != '' and self.custom_menu_name != main_menu_override.get():
             try:
                 self.menu = compute_menu_from_csv(os.path.join(CUSTOM_MENU_DIRECTORY, main_menu_override.get() + '.csv'))
-                self.custom_menu_name = name
+                self.custom_menu_name = main_menu_override.get()
             except:
                 self.menu = self.menus['main']
-        else:
+        elif main_menu_override.get() == '':
             self.menu = self.menus[name]
     
     def get_menu(self):
