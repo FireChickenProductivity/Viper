@@ -55,6 +55,13 @@ def compute_menu_from_csv(file_name):
     with open(file_name) as menu_file:
         menu_info = csv.reader(menu_file)
         for item in menu_info:
-            csv_Menu.add_item(item[0],getattr(actions,item[1]))
+            name = item[0]
+            action = item[1]
+            reset_menu_index_after_use = True
+            if len(item) > 2:
+                action = item[2]
+                reset_menu_index_after_use = item[1] == 'reset'
+                print(reset_menu_index_after_use)
+            csv_Menu.add_item(name, getattr(actions, action), reset_menu_index_after_use)
 
     return csv_Menu
