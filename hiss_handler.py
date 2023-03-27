@@ -321,7 +321,7 @@ def build_main_menu():
     menu.add_item('Right Click', actions.user.fire_chicken_hissing_control_right_click)
     menu.add_item('Double Click', actions.user.fire_chicken_hissing_control_double_left_click)
     menu.add_item('Toggle Holding Left Click Down', actions.user.fire_chicken_hissing_control_toggle_drag)
-    menu.add_item('Scroll', actions.user.fire_chicken_hissing_control_activate_scrolling_menu)
+    menu.add_item('Scroll', actions.user.fire_chicken_hissing_control_activate_scrolling_menu, reset_menu_index_after_use = False)
     menu.add_item('Keyboard', actions.user.fire_chicken_hissing_control_activate_keyboard_menu)
     menu.add_item('Sleep', actions.speech.disable)
     return menu
@@ -496,7 +496,6 @@ class HissingControl:
         gui.hide()
         self.progress_towards_next_action = 0
         self.menu.pick_current_item()
-        self.menu.reset_selection()
 
     def increase_progress_towards_next_action(self, direction_reversed):
         self.progress_towards_next_action += 1
