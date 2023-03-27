@@ -522,8 +522,10 @@ class HissingControl:
                 self.custom_menu_name = main_menu_override.get()
             except:
                 self.menu = self.menus['main']
+                self.custom_menu_name = ''
         elif main_menu_override.get() == '':
             self.menu = self.menus[name]
+            self.custom_menu_name = ''
     
     def get_menu(self):
         return self.menu
