@@ -11,6 +11,8 @@ class Menu:
     def pick_current_item(self):
         item: MenuItem = self.menu_items[self.current_item]
         item.pick_item()
+        if item.should_reset_menu_index_after_use():
+            self.reset_selection()
    
     def select_next_item(self, direction: int = 1):
         # if direction = 1 move down if -1 move up
@@ -25,14 +27,15 @@ class Menu:
     def get_current_item_number(self):
         return self.current_item
    
-    def add_item(self, display_name: str, action):
-        new_item: MenuItem = MenuItem(display_name, action)
+    def add_item(self, display_name: str, action, reset_menu_index_after_use: bool = True):
+        new_item: MenuItem = MenuItem(display_name, action, reset_menu_index_after_use)
         self.menu_items.append(new_item)
 
 class MenuItem:
-    def __init__(self, display_name: str, action):
+    def __init__(self, display_name: str, action, reset_menu_index_after_use: bool = True):
         self.display_name = display_name
         self.action = action
+        self.reset_menu_index_after_use = reset_menu_index_after_use
    
     def pick_item(self):
         self.action()
@@ -42,6 +45,9 @@ class MenuItem:
 
     def is_individual_item(self):
         return True
+    
+    def should_reset_menu_index_after_use(self):
+        return self.reset_menu_index_after_use
 
 #Function provided by WhatIV
 def compute_menu_from_csv(file_name):
