@@ -264,6 +264,12 @@ class Actions:
         direction_handler.change_direction_by(degrees)
         direction_handler.lock_direction()
     
+    def fire_chicken_hissing_control_set_direction(degrees: int):
+        ''''''
+        direction_handler.unlock_direction()
+        direction_handler.set_direction(degrees)
+        direction_handler.lock_direction()
+    
     def fire_chicken_hissing_control_update_mode(mode: str):
         ''''''
         hissing_control.update_mode(HissingControlMode[mode])
@@ -397,6 +403,11 @@ class DirectionHandler:
                 self.direction -= MAXIMUM_ANGLE
             self.display_direction()
     
+    def set_direction(self, direction: float):
+        if self.direction_editable:
+            self.direction = direction
+            self.display_direction()
+
     def reverse_direction(self):
         self.direction += 180
 
