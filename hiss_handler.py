@@ -425,6 +425,7 @@ class HissingControl:
         self.menus = {'main': build_main_menu(), 'scroll': build_scroll_menu(self), 'keyboard': create_keyboard_menu(self)}
         self.custom_menu_name = ''
         self.current_menu_name = ''
+        self.custom_menus = {}
         self.update_current_menu('main')
 
     def reset_mode(self):
@@ -529,7 +530,12 @@ class HissingControl:
         self.current_menu_name = name
         if name == 'main' and main_menu_override.get() != '' and self.custom_menu_name != main_menu_override.get():
             try:
+                index = 0
+                if main_menu_override.get() in self.custom_menus:
+                    index = self.custom_menus[main_menu_override.get()].get_current_item_number()
                 self.menu = compute_menu_from_csv(os.path.join(CUSTOM_MENU_DIRECTORY, main_menu_override.get() + '.csv'))
+                self.menu.select_item(index)
+                self.custom_menus[main_menu_override.get()] = self.menu
                 self.custom_menu_name = main_menu_override.get()
             except:
                 self.menu = self.menus['main']
