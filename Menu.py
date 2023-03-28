@@ -62,6 +62,15 @@ def compute_menu_from_csv(file_name):
                 action = item[2]
                 reset_menu_index_after_use = item[1] == 'reset'
                 print(reset_menu_index_after_use)
-            csv_Menu.add_item(name, getattr(actions, action), reset_menu_index_after_use)
+            csv_Menu.add_item(name, compute_action(action), reset_menu_index_after_use)
 
     return csv_Menu
+
+def compute_action(action_description: str):
+    action = action_description
+    argument = None
+    if action_description.startswith('key ') or action_description.startswith('insert '):
+        action, _, argument = action_description.partition(' ')
+        function = getattr(actions, action)
+        return lambda: function(argument)
+    return getattr(actions, action_description)
