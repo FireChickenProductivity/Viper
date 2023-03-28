@@ -534,7 +534,7 @@ class HissingControl:
             except:
                 self.menu = self.menus['main']
                 self.custom_menu_name = ''
-        elif main_menu_override.get() == '':
+        elif main_menu_override.get() == '' or name in self.menus and not (name == 'main'):
             self.menu = self.menus[name]
             self.custom_menu_name = ''
     
