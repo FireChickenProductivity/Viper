@@ -498,6 +498,7 @@ class HissingControl:
             self.stop_scrolling()
         elif self.mode == HissingControlMode.CUSTOM_JOB:
             self.job_handler.stop_job()
+            self.update_mode(HissingControlMode.ACTION_SELECTION)
 
     def should_select_action(self):
         return self.mode in [HissingControlMode.ACTION_SELECTION, HissingControlMode.KEYBOARD]
@@ -584,7 +585,7 @@ class HissingControl:
     
     def set_hissing_job(self, job, millisecond_delay_between_calls, on_start = None, on_stop = None):
         self.job_handler.update_job(job, millisecond_delay_between_calls, on_start, on_stop)
-        self.update_mode('custom_job')
+        self.update_mode(HissingControlMode.CUSTOM_JOB)
 
     def get_menu(self):
         return self.menu
