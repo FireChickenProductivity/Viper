@@ -414,12 +414,41 @@ class DirectionHandler:
     def display_direction(self):
         self.direction_display.display_direction(self.direction)
 
+class HissingJobHandler(AsynchronousJobHandler):
+    def __init__(self):
+        self.on_start = None
+        self.on_stop = None
+        self.time_between_calls_in_milliseconds = None
+        AsynchronousJobHandler.__init__(self)
+    
+    def update_job(self, job_function, time_between_calls_in_milliseconds, on_start = None, on_stop = None):
+        self.job_function = job_function
+        self.time_between_calls_in_milliseconds = time_between_calls_in_milliseconds
+        self.on_start = on_start
+        self.on_stop = on_stop
+
+    def start_current_job(self):
+        self.start_job(self.job_function, self.time_between_calls_in_milliseconds)
+
+    def start_job(self, job, time_between_calls_in_milliseconds: int):
+        if self.on_start:
+            self.on_start()
+        AsynchronousJobHandler.start_job(self, job, time_between_calls_in_milliseconds)
+    
+    def stop_job(self):
+        if self.on_stop:
+            self.on_stop()
+        AsynchronousJobHandler.stop_job(self)
+        self.on_start = None
+        self.on_stop = None
+        self.time_between_calls_in_milliseconds = None
+
 class HissingControl:
     def __init__(self):
         self.reset_mode()
         self.vertical_scroll_amount = 0
         self.horizontal_scroll_amount = 0
-        self.job_handler = AsynchronousJobHandler()
+        self.job_handler = HissingJobHandler()
         self.progress_towards_next_action = 0
         self.hissing_active = False
         self.menus = {'main': build_main_menu(), 'scroll': build_scroll_menu(self), 'keyboard': create_keyboard_menu(self)}
@@ -448,6 +477,8 @@ class HissingControl:
             self.start_increasing_progress_towards_next_action(override_values.menu_direction_reversed)
         elif self.mode == HissingControlMode.SCROLLING:
             self.start_scrolling(override_values.vertical_scrolling_speed_override, override_values.horizontal_scrolling_speed_override)
+        elif self.mode == HissingControlMode.CUSTOM_JOB:
+            self.job_handler.start_current_job()
 
     def handle_hiss_ending(self):
         self.hissing_active = False
@@ -460,6 +491,8 @@ class HissingControl:
             self.stop_increasing_progress_towards_next_action()
         elif self.mode == HissingControlMode.SCROLLING:
             self.stop_scrolling()
+        elif self.mode == HissingControlMode.CUSTOM_JOB:
+            self.job_handler.stop_job()
 
     def should_select_action(self):
         return self.mode in [HissingControlMode.ACTION_SELECTION, HissingControlMode.KEYBOARD]
@@ -568,6 +601,7 @@ class HissingControlMode(Enum):
     MOVEMENT = 3
     SCROLLING = 4
     KEYBOARD = 5
+    CUSTOM_JOB = 6
 
 class DirectionDisplay:
     def __init__(self):
