@@ -8,7 +8,7 @@ from .Dragging import MouseDragger
 from .Menu import Menu, compute_menu_from_csv
 from .asynchronous_job_scheduling import AsynchronousJobHandler
 from .keyboard import create_keyboard_menu
-from typing import Union
+from typing import Callable, Union
 import os
 
 module = Module()
@@ -19,6 +19,7 @@ module.tag(HISSING_CONTROL_TAG_BASE_NAME + '_direction_selection', desc = 'Activ
 module.tag(HISSING_CONTROL_TAG_BASE_NAME + '_movement', desc = 'Active when hissing moves the mouse through the fire chicken hissing control')
 module.tag(HISSING_CONTROL_TAG_BASE_NAME + '_scrolling', desc = 'Active when hissing scrolls through the fire chicken hissing control')
 module.tag(HISSING_CONTROL_TAG_BASE_NAME + '_keyboard', desc = 'Active with the fire chicken hissing keyboard control')
+module.tag(HISSING_CONTROL_TAG_BASE_NAME + '_custom_job', desc = 'Active when hissing activates a custom job with the fire chicken hissing control')
 HISSING_CONTROL_MODE_TAG_PREFIX = 'user.' + HISSING_CONTROL_TAG_BASE_NAME + '_'
 
 hissing_mode_context = Context()
@@ -248,6 +249,10 @@ class Actions:
         ''''''
         hissing_control.simulate_hissing_change(OverrideValues(movement_delay_override = movement_delay))
     
+    def fire_chicken_hissing_control_register_job(job: Callable, millisecond_delay_between_calls: int, on_start: Callable = None, on_stop: Callable = None):
+        ''''''
+        hissing_control.set_hissing_job(job, millisecond_delay_between_calls, on_start, on_stop)
+
     def fire_chicken_hissing_control_reverse_direction():
         ''''''
         direction_handler.reverse_direction()
@@ -577,6 +582,10 @@ class HissingControl:
             self.menu = self.menus[name]
             self.custom_menu_name = ''
     
+    def set_hissing_job(self, job, millisecond_delay_between_calls, on_start = None, on_stop = None):
+        self.job_handler.update_job(job, millisecond_delay_between_calls, on_start, on_stop)
+        self.update_mode('custom_job')
+
     def get_menu(self):
         return self.menu
     
