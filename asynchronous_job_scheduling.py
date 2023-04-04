@@ -11,3 +11,6 @@ class AsynchronousJobHandler:
         if self.job:
             cron.cancel(self.job)
         self.job = None
+    
+    def has_job(self):
+        return self.job is not None
