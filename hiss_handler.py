@@ -153,6 +153,13 @@ main_menu_override = module.setting(
     desc = 'When not the empty string, overrides the main menu with the specified custom menu'
 )
 
+use_actual_hiss_handler = module.setting(
+    'fire_chicken_hissing_control_use_literal_hiss_handler',
+    type = int,
+    default = 1,
+    desc = 'If nonzero, the actual hissing handler is used'
+)
+
 class OverrideValues:
     def __init__(self, should_increase_direction_on_direction_change = True, movement_delay_override = False, vertical_scrolling_speed_override = False, 
     horizontal_scrolling_speed_override = False, menu_direction_reversed = False):
@@ -220,7 +227,7 @@ def on_hiss(active):
 
 def hissing_control_enabled():
     tags = scope.get("tag")
-    return 'user.' + HISSING_CONTROL_TAG_BASE_NAME in tags
+    return 'user.' + HISSING_CONTROL_TAG_BASE_NAME in tags and use_actual_hiss_handler.get()
 
 @module.action_class
 class Actions:
