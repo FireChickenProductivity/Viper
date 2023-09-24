@@ -225,9 +225,10 @@ def on_hiss(active):
         else:
             actions.user.fire_chicken_simulate_hissing_change(active)
 
+hissing_control_manually_disabled: bool = False
 def hissing_control_enabled():
     tags = scope.get("tag")
-    return 'user.' + HISSING_CONTROL_TAG_BASE_NAME in tags and use_actual_hiss_handler.get()
+    return 'user.' + HISSING_CONTROL_TAG_BASE_NAME in tags and use_actual_hiss_handler.get() and not hissing_control_manually_disabled
 
 @module.action_class
 class Actions:
@@ -328,6 +329,16 @@ class Actions:
         ''''''
         if hissing_control.get_hissing_active():
             actions.user.fire_chicken_hissing_control_left_click()
+
+    def fire_chicken_hissing_control_manually_reenable():
+        ''''''
+        global hissing_control_manually_disabled
+        hissing_control_manually_disabled = False
+
+    def fire_chicken_hissing_control_manually_disable():
+        ''''''
+        global hissing_control_manually_disabled
+        hissing_control_manually_disabled = True
 
 mouse_dragger = MouseDragger()
 
