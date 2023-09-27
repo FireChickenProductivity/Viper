@@ -484,6 +484,7 @@ class HissingControl:
         self.update_mode(HissingControlMode.ACTION_SELECTION)
 
     def simulate_hissing_change(self, override_values: OverrideValues = OverrideValues()):
+        if hissing_control_manually_disabled: return 
         if self.hissing_active:
             self.handle_hiss_ending()
         else:
