@@ -229,6 +229,10 @@ hissing_control_manually_disabled: bool = False
 def hissing_control_enabled():
     tags = scope.get("tag")
     return 'user.' + HISSING_CONTROL_TAG_BASE_NAME in tags and use_actual_hiss_handler.get() and not hissing_control_manually_disabled
+    
+manual_disabling_context = Context()
+HISSING_CONTROL_MANUALLY_DISABLED_TAG_NAME = HISSING_CONTROL_TAG_BASE_NAME + '_manually_disabled'
+module.tag(HISSING_CONTROL_MANUALLY_DISABLED_TAG_NAME, desc = "Active when the hissing control has been manually disabled")
 
 @module.action_class
 class Actions:
@@ -334,11 +338,13 @@ class Actions:
         ''''''
         global hissing_control_manually_disabled
         hissing_control_manually_disabled = False
+        tag_utilities.deactivate_tags_in_context(manual_disabling_context)
 
     def fire_chicken_hissing_control_manually_disable():
         ''''''
         global hissing_control_manually_disabled
         hissing_control_manually_disabled = True
+        tag_utilities.make_tag_only_active_tag_in_context('user.' + HISSING_CONTROL_MANUALLY_DISABLED_TAG_NAME, manual_disabling_context)
 
 mouse_dragger = MouseDragger()
 
