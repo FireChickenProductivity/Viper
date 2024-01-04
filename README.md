@@ -87,3 +87,6 @@ user.fire_chicken_hissing_control_use_literal_hiss_handler has type int. If nonz
 The display code for the direction line was heavily based on the knausj_talon configuration. Proper credit and a copy of the knausj_talon license is available in the direction_display.py file.
 
 Thank you to GitHub user whatIV for contributing to this project.
+
+## Known Issues
+The menu sometimes reopens after a hiss and keeps cycling through menu items untill you hiss again. The code currently response to changes and whether you are hissing or not, so the end of the next hiss usually has the same problem. If you have popping enabled for controlling the direction change process, you can get it out of that state by selecting that menu item and then using a pop to end to the direction change. If other people want to use this project and find that issue annoying, I could try to address it.
