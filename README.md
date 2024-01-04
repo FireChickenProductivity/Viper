@@ -3,7 +3,7 @@ Offers talon voice customization for hissing control.
 
 Viper provides a hissing menu that opens by default when you hiss. The selected item on the menu advances as you keep hissing, and you choose the currently selected item and close the menu by stopping hissing. The default main menu is primarily geared towards mouse control.
 
-Be aware that excessive use of hissing can harm your jaw. Also, using the direction changed graphical display while set to rotate rapidly may harm users susceptible to seizures triggered by visual stimulus.
+Be aware that excessive use of hissing can harm your jaw. Also, using the direction change graphical display while set to rotate rapidly may harm users susceptible to seizures triggered by visual stimulus.
 
 ## Pick Direction and Move
 This menu option shows a line at the cursor pointing in the movement direction. Hissing from here will rotate the line until you stop. Hissing after that will then move the cursor in the desired direction. This offers a slow but sometimes useful way to move the cursor.
@@ -15,7 +15,7 @@ This opens a submenu for picking a scroll direction. Hissing after picking a dir
 This opens an experimental set of menus for operating the keyboard. This is a highly inefficient way to operate the keyboard. 
 
 ## Custom Menus
-Viper will generate a directory called "Viper Settings" in your talon user directory. This will have a subdirectory called "Custom Menus". Custom menus may be defined here in CSV files. Every line defines a menu item. The first column gives the item name. If the second column consists of the word "stay", the menu will start at that item when selected the next time you open the hissing menu. The last column gives the action to perform when the item is selected. As a convenience, if the action is key or insert, you may put the key stroke or text to insert in this column by putting a space between the action and the keystroke/text. You may use a custom menu instead of the main menu by using the user.fire_chicken_hissing_control_main_menu_override setting.
+Viper will generate a directory called "Viper Settings" in your talon user directory. This will have a subdirectory called "Custom Menus". Custom menus may be defined here in CSV files. Every line defines a menu item. The first column gives the item name. If the second column consists of the word "stay", the menu will start at that item after you select it the next time you open the hissing menu. The last column gives the action to perform when the item is selected. As a convenience, if the action is key or insert, you may put the key stroke or text to insert in this column by putting a space between the action and the keystroke/text. You may use a custom menu instead of the main menu by using the user.fire_chicken_hissing_control_main_menu_override setting.
 
 Example custom menu for working with EquatIO and my custom EquatIO talon plugin:
 ```
