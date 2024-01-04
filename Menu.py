@@ -18,6 +18,9 @@ class Menu:
         # if direction = 1 move down if -1 move up
         self.current_item = (self.current_item + direction) % len(self.menu_items)
 
+    def select_item(self, item_number: int):
+        self.current_item = item_number
+        
     def reset_selection(self):
         self.current_item = 0
 
