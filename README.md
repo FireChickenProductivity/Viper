@@ -16,3 +16,5 @@ This opens an experimental set of menus for operating the keyboard. This is a hi
 
 ## Credit
 The display code for the direction line was heavily based on the knausj_talon configuration. Proper credit and a copy of the knausj_talon license is available in the direction_display.py file.
+
+Thank you to GitHub user whatIV for contributing to this project.
