@@ -77,7 +77,7 @@ user.fire_chicken_hissing_control_pop_reverses_direction_during_direction_change
 
 user.fire_chicken_hissing_control_hissing_start_time has type int. How long you must hiss in milliseconds before you are considered to have start hissing. Increasing this can reduce false.positive hiss recognition.
 
-user.fire_chicken_hissing_control_hissing_start_during_movement_reverses_direction has type int. If nonzero, starting to hiss during mouse movement reverses the direction.
+user.fire_chicken_hissing_control_hissing_start_during_movement_reverses_direction has type int. If nonzero, starting to hiss during mouse movement reverses the direction. If you use another noise to start the movement, you could then use this to switch direction. A useful strategy is to have the cursor move relatively quickly when you start moving and then use hissing to reverse the direction but move at a slower pace so that the hissing can be used to achieve precision while the initial movement would quickly get you in the right area.
 
 user.fire_chicken_hissing_control_main_menu_override has type str. When not the empty string, overrides the main menu with the specified custom menu.
 
