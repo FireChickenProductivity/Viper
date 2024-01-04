@@ -77,7 +77,7 @@ next_action_progress_needed = 'user.' + next_action_progress_needed_setting_name
 module.setting(
     next_action_progress_needed_setting_name,
     type = int,
-    default = 10,
+    default = 4,
     desc = 'How much progress towards the next action has to be accumulated before the hissing action changes to the next one. One gets obtained each time interval of hissing.'
 )
 
