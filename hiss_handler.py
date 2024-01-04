@@ -1,4 +1,4 @@
-from talon import Module, Context, noise, actions, cron, scope, imgui, app
+from talon import Module, Context, noise, actions, cron, scope, imgui, app, settings
 from enum import Enum
 from .fire_chicken.mouse_position import MousePosition
 from .mouse_position_manipulation import change_mouse_position_by, compute_mouse_position_with_direction_and_magnitude
@@ -27,134 +27,172 @@ def update_hissing_mode_context(mode):
     global hissing_mode_context
     tag_utilities.make_tag_only_active_tag_in_context(mode, hissing_mode_context)
 
-movement_amount = module.setting(
-    'fire_chicken_hissing_control_movement_amount',
+movement_amount_setting_name = 'fire_chicken_hissing_control_movement_amount'
+movement_amount = 'user.' + movement_amount_setting_name
+module.setting(
+    movement_amount_setting_name,
     type = int,
     default = 3,
     desc = 'How much to move the cursor during each time step with the fire chicken hissing control movement in pixels'
 )
 
-direction_change_amount = module.setting(
-    'fire_chicken_hissing_control_direction_change_amount',
+direction_change_amount_setting_name = 'fire_chicken_hissing_control_direction_change_amount'
+direction_change_amount = 'user.' + direction_change_amount_setting_name
+module.setting(
+    direction_change_amount_setting_name,
     type = float,
     default = 45.0,
     desc = 'How much to change the direction during each time step when changing the hissing control movement direction in degrees'
 )
 
-mouse_movement_delay = module.setting(
-    'fire_chicken_hissing_control_mouse_movement_delay',
+mouse_movement_delay_setting_name = 'fire_chicken_hissing_control_mouse_movement_delay'
+mouse_movement_delay = 'user.' + mouse_movement_delay_setting_name
+module.setting(
+    mouse_movement_delay_setting_name,
     type = int,
     default = 20,
     desc = 'How long to pause between individual mouse movements with the fire chicken hissing control in milliseconds'
 )
 
-direction_change_delay = module.setting(
-    'fire_chicken_hissing_control_direction_changed_delay',
+direction_change_delay_setting_name = 'fire_chicken_hissing_control_direction_changed_delay'
+direction_change_delay = 'user.' + direction_change_delay_setting_name
+module.setting(
+    direction_change_delay_setting_name,
     type = int,
     default = 600,
     desc = 'How long to pause between individual changes in direction with the fire chicken hissing control in milliseconds'
 )
 
-direction_line_size = module.setting(
-    'fire_chicken_hissing_control_direction_line_size',
+direction_line_size_setting_name = 'fire_chicken_hissing_control_direction_line_size'
+direction_line_size = 'user.' + direction_line_size_setting_name
+module.setting(
+    direction_line_size_setting_name,
     type = int,
     default = 400,
     desc = 'The size in pixels of the direction line of the fire chicken hissing control'
 )
 
-next_action_progress_needed = module.setting(
-    'fire_chicken_hissing_control_next_action_progress_amount',
+next_action_progress_needed_setting_name = 'fire_chicken_hissing_control_next_action_progress_amount'
+next_action_progress_needed = 'user.' + next_action_progress_needed_setting_name
+module.setting(
+    next_action_progress_needed_setting_name,
     type = int,
     default = 10,
     desc = 'How much progress towards the next action has to be accumulated before the hissing action changes to the next one. One gets obtained each time interval of hissing.'
 )
 
-next_action_progress_delay = module.setting(
-    'fire_chicken_hissing_control_next_action_progress_delay',
+next_action_progress_delay_setting_name = 'fire_chicken_hissing_control_next_action_progress_delay'
+next_action_progress_delay = 'user.' + next_action_progress_delay_setting_name
+module.setting(
+    next_action_progress_delay_setting_name,
     type = int,
     default = 100,
     desc = 'The amount of time one must hiss to gain 1 unit of progress towards the next hissing action.'
 )
 
-simulate_hiss_with_pop = module.setting(
-    'fire_chicken_hissing_control_simulate_hiss_with_pop',
+simulate_hiss_with_pop_setting_name = 'fire_chicken_hissing_control_simulate_hiss_with_pop'
+simulate_hiss_with_pop = 'user.' + simulate_hiss_with_pop_setting_name
+module.setting(
+    simulate_hiss_with_pop_setting_name,
     type = int,
     default = 0,
     desc = 'When set to value other than zero, popping simulates hissing with the fire chicken hissing control'
 )
 
-pop_mouse_movement_delay = module.setting(
-    'fire_chicken_hissing_mouse_pop_control_movement_delay',
+pop_mouse_movement_delay_setting_name = 'fire_chicken_hissing_mouse_pop_control_movement_delay'
+pop_mouse_movement_delay = 'user.' + pop_mouse_movement_delay_setting_name
+module.setting(
+    pop_mouse_movement_delay_setting_name,
     type = int,
     default = 10,
     desc = 'How long to pause between individual mouse movements with the fire chicken hissing control when movement is started with the popping sound'
 )
 
-vertical_scroll_amount = module.setting(
-    'fire_chicken_hissing_control_vertical_scroll_amount',
+vertical_scroll_amount_setting_name = 'fire_chicken_hissing_control_vertical_scroll_amount'
+vertical_scroll_amount = 'user.' + vertical_scroll_amount_setting_name
+module.setting(
+    vertical_scroll_amount_setting_name,
     type = int,
     default = 50,
     desc = 'How quickly to scroll vertically with the fire chicken hissing control'
 )
 
-horizontal_scroll_amount = module.setting(
-    'fire_chicken_hissing_control_horizontal_scroll_amount',
+horizontal_scroll_amount_setting_name = 'fire_chicken_hissing_control_horizontal_scroll_amount'
+horizontal_scroll_amount = 'user.' + horizontal_scroll_amount_setting_name
+module.setting(
+    horizontal_scroll_amount_setting_name,
     type = int,
     default = 20,
     desc = 'How quickly to scroll horizontally with the fire chicken hissing control'
 )
 
-pop_vertical_scroll_amount = module.setting(
-    'fire_chicken_hissing_control_pop_vertical_scroll_amount',
+pop_vertical_scroll_amount_setting_name = 'fire_chicken_hissing_control_pop_vertical_scroll_amount'
+pop_vertical_scroll_amount = 'user.' + pop_vertical_scroll_amount_setting_name
+module.setting(
+    pop_vertical_scroll_amount_setting_name,
     type = int,
     default = 100,
     desc = 'How quickly to scroll vertically with the fire chicken hissing control with pop input'
 )
 
-pop_horizontal_scroll_amount = module.setting(
-    'fire_chicken_hissing_control_pop_horizontal_scroll_amount',
+pop_horizontal_scroll_amount_setting_name = 'fire_chicken_hissing_control_pop_horizontal_scroll_amount'
+pop_horizontal_scroll_amount = 'user.' + pop_horizontal_scroll_amount_setting_name
+module.setting(
+    pop_horizontal_scroll_amount_setting_name,
     type = int,
     default = 40,
     desc = 'How quickly to scroll horizontally with the fire chicken hissing control with pop input'
 )
 
-pop_reverses_menu_direction = module.setting(
-    'fire_chicken_hissing_control_pop_reverses_menu',
+pop_reverses_menu_direction_setting_name = 'fire_chicken_hissing_control_pop_reverses_menu'
+pop_reverses_menu_direction = 'user.' + pop_reverses_menu_direction_setting_name
+module.setting(
+    pop_reverses_menu_direction_setting_name,
     type = int,
     default = 1,
     desc = 'When set to anything other than 0, popping interactions with menus have reversed direction'
 )
 
-pop_reverses_direction_during_direction_change = module.setting(
-    'fire_chicken_hissing_control_pop_reverses_direction_during_direction_change',
+pop_reverses_direction_during_direction_change_setting_name = 'fire_chicken_hissing_control_pop_reverses_direction_during_direction_change'
+pop_reverses_direction_during_direction_change = 'user.' + pop_reverses_direction_during_direction_change_setting_name
+module.setting(
+    pop_reverses_direction_during_direction_change_setting_name,
     type = int,
     default = 1,
     desc = 'When set to anything other than 0, popping during direction selection reverses direction'
 )
 
-hissing_start_time = module.setting(
-    'fire_chicken_hissing_control_hissing_start_time',
+hissing_start_time_setting_name = 'fire_chicken_hissing_control_hissing_start_time'
+hissing_start_time = 'user.' + hissing_start_time_setting_name
+module.setting(
+    hissing_start_time_setting_name,
     type = int,
     default = 0,
     desc = 'How long you must hiss in milliseconds before you are considered to have start hissing. Increasing this can reduce false positive hiss recognition.'
 )
 
-hissing_start_during_movement_reverses_direction = module.setting(
-    'fire_chicken_hissing_control_hissing_start_during_movement_reverses_direction',
+hissing_start_during_movement_reverses_direction_setting_name = 'fire_chicken_hissing_control_hissing_start_during_movement_reverses_direction'
+hissing_start_during_movement_reverses_direction = 'user.' + hissing_start_during_movement_reverses_direction_setting_name
+module.setting(
+    hissing_start_during_movement_reverses_direction_setting_name,
     type = int,
     default = 1,
     desc = 'If nonzero, starting to hiss during mouse movement reverses the direction'
 )
 
-main_menu_override = module.setting(
-    'fire_chicken_hissing_control_main_menu_override',
+main_menu_override_setting_name = 'fire_chicken_hissing_control_main_menu_override'
+main_menu_override = 'user.' + main_menu_override_setting_name
+module.setting(
+    main_menu_override_setting_name,
     type = str,
     default = '',
     desc = 'When not the empty string, overrides the main menu with the specified custom menu'
 )
 
-use_actual_hiss_handler = module.setting(
-    'fire_chicken_hissing_control_use_literal_hiss_handler',
+use_actual_hiss_handler_setting_name = 'fire_chicken_hissing_control_use_literal_hiss_handler'
+use_actual_hiss_handler = 'user.' + use_actual_hiss_handler_setting_name
+module.setting(
+    use_actual_hiss_handler_setting_name,
     type = int,
     default = 1,
     desc = 'If nonzero, the actual hissing handler is used'
@@ -170,15 +208,15 @@ class OverrideValues:
         self.menu_direction_reversed = menu_direction_reversed
 
 def should_simulate_hiss_with_pop():
-    return simulate_hiss_with_pop.get() != 0
+    return settings.get(simulate_hiss_with_pop) != 0
 
 def compute_pop_override_values():
     values = OverrideValues(
-        movement_delay_override = pop_mouse_movement_delay.get(),
-        vertical_scrolling_speed_override = pop_vertical_scroll_amount.get(),
-        horizontal_scrolling_speed_override = pop_horizontal_scroll_amount.get(),
-        menu_direction_reversed = pop_reverses_menu_direction.get() != 0,
-        should_increase_direction_on_direction_change = pop_reverses_direction_during_direction_change.get() == 0,
+        movement_delay_override = settings.get(pop_mouse_movement_delay),
+        vertical_scrolling_speed_override = settings.get(pop_vertical_scroll_amount),
+        horizontal_scrolling_speed_override = settings.get(pop_horizontal_scroll_amount),
+        menu_direction_reversed = settings.get(pop_reverses_menu_direction) != 0,
+        should_increase_direction_on_direction_change = settings.get(pop_reverses_direction_during_direction_change) == 0,
     )
     return values
 
@@ -199,7 +237,7 @@ class DelayedHissingJobHandler:
             self.stop_delayed_hiss()
     
     def start_delayed_hiss(self):
-        self.job = cron.after(f'{hissing_start_time.get()}ms', self.start_hiss_if_not_canceled)
+        self.job = cron.after(f'{settings.get(hissing_start_time)}ms', self.start_hiss_if_not_canceled)
         
     def start_hiss_if_not_canceled(self):
         actions.user.fire_chicken_simulate_hissing_change(True)
@@ -220,7 +258,7 @@ class DelayedHissingJobHandler:
 delayed_hissing_job_handler = DelayedHissingJobHandler()
 def on_hiss(active):
     if hissing_control_enabled():
-        if hissing_start_time.get() > 0:
+        if settings.get(hissing_start_time) > 0:
             delayed_hissing_job_handler.handled_delayed_hiss(active)
         else:
             actions.user.fire_chicken_simulate_hissing_change(active)
@@ -228,7 +266,7 @@ def on_hiss(active):
 hissing_control_manually_disabled: bool = False
 def hissing_control_enabled():
     tags = scope.get("tag")
-    return 'user.' + HISSING_CONTROL_TAG_BASE_NAME in tags and use_actual_hiss_handler.get() and not hissing_control_manually_disabled
+    return 'user.' + HISSING_CONTROL_TAG_BASE_NAME in tags and settings.get(use_actual_hiss_handler) and not hissing_control_manually_disabled
     
 manual_disabling_context = Context()
 HISSING_CONTROL_MANUALLY_DISABLED_TAG_NAME = HISSING_CONTROL_TAG_BASE_NAME + '_manually_disabled'
@@ -238,7 +276,7 @@ module.tag(HISSING_CONTROL_MANUALLY_DISABLED_TAG_NAME, desc = "Active when the h
 class Actions:
     def fire_chicken_hissing_control_handle_hiss(active: bool):
         ''''''
-        if hissing_start_during_movement_reverses_direction.get() != 0 and active and hissing_control.get_hissing_active() and hissing_control.get_mode() == HissingControlMode.MOVEMENT:
+        if settings.get(hissing_start_during_movement_reverses_direction) != 0 and active and hissing_control.get_hissing_active() and hissing_control.get_mode() == HissingControlMode.MOVEMENT:
             hissing_control.simulate_hissing_change()
             direction_handler.reverse_direction()
             hissing_control.update_mode(HissingControlMode.MOVEMENT)
@@ -367,13 +405,13 @@ def build_scroll_menu(hissing_control):
         hissing_control.update_mode(HissingControlMode.SCROLLING)
         hissing_control.set_horizontal_and_vertical_scroll_amounts(vertical, horizontal)
     def scroll_up():
-        buffer_scroll(-vertical_scroll_amount.get(), 0)
+        buffer_scroll(-settings.get(vertical_scroll_amount), 0)
     def scroll_down():
-        buffer_scroll(vertical_scroll_amount.get(), 0)
+        buffer_scroll(settings.get(vertical_scroll_amount), 0)
     def scroll_right():
-        buffer_scroll(0, horizontal_scroll_amount.get())
+        buffer_scroll(0, settings.get(horizontal_scroll_amount))
     def scroll_left():
-        buffer_scroll(0, -horizontal_scroll_amount.get())
+        buffer_scroll(0, -settings.get(horizontal_scroll_amount))
     menu.add_item('Scroll Up', scroll_up)
     menu.add_item('Scroll Down', scroll_down)
     menu.add_item('Scroll Right', scroll_right)
@@ -406,13 +444,13 @@ class DirectionHandler:
 
     def start_increasing_direction(self):
         def increase_direction():
-            self.change_direction_by(direction_change_amount.get())
-        self.job_handler.start_job(increase_direction, direction_change_delay.get())
+            self.change_direction_by(settings.get(direction_change_amount))
+        self.job_handler.start_job(increase_direction, settings.get(direction_change_delay))
 
     def start_decreasing_direction(self):
         def decrease_direction():
-            self.change_direction_by(-direction_change_amount.get())
-        self.job_handler.start_job(decrease_direction, direction_change_delay.get())
+            self.change_direction_by(-settings.get(direction_change_amount))
+        self.job_handler.start_job(decrease_direction, settings.get(direction_change_delay))
 
     def stop_changing_direction(self):
         self.lock_direction()
@@ -420,7 +458,7 @@ class DirectionHandler:
         self.hide_direction_display()
     
     def hide_direction_display(self):
-        cron.after(f'{direction_change_delay.get()*2}ms', self.direction_display.hide)
+        cron.after(f'{settings.get(direction_change_delay)*2}ms', self.direction_display.hide)
     
     def get_direction(self):
         return self.direction
@@ -529,11 +567,11 @@ class HissingControl:
         return self.mode in [HissingControlMode.ACTION_SELECTION, HissingControlMode.KEYBOARD]
 
     def start_moving_mouse(self, movement_delay_override):
-        delay_amount = mouse_movement_delay.get()
+        delay_amount = settings.get(mouse_movement_delay)
         if movement_delay_override:
             delay_amount = movement_delay_override
         def move_mouse():
-            mouse_position_change: MousePosition = compute_mouse_position_with_direction_and_magnitude(direction_handler.get_direction(), movement_amount.get())
+            mouse_position_change: MousePosition = compute_mouse_position_with_direction_and_magnitude(direction_handler.get_direction(), settings.get(movement_amount))
             change_mouse_position_by(mouse_position_change)
         self.job_handler.start_job(move_mouse, delay_amount)
 
@@ -564,7 +602,7 @@ class HissingControl:
     def start_increasing_progress_towards_next_action(self, direction_reversed):
         def make_progress_towards_next_action():
             self.increase_progress_towards_next_action(direction_reversed)
-        self.job_handler.start_job(make_progress_towards_next_action, next_action_progress_delay.get())
+        self.job_handler.start_job(make_progress_towards_next_action, settings.get(next_action_progress_delay))
         gui.show()
 
     def stop_increasing_progress_towards_next_action(self):
@@ -578,7 +616,7 @@ class HissingControl:
         menu_change_value = 1
         if direction_reversed:
             menu_change_value = -1
-        if self.progress_towards_next_action >= next_action_progress_needed.get():
+        if self.progress_towards_next_action >= settings.get(next_action_progress_needed):
             self.progress_towards_next_action = 0
             self.menu.select_next_item(menu_change_value)
 
@@ -592,19 +630,19 @@ class HissingControl:
 
     def update_current_menu(self, name: str):
         self.current_menu_name = name
-        if name == 'main' and main_menu_override.get() != '' and self.custom_menu_name != main_menu_override.get():
+        if name == 'main' and settings.get(main_menu_override) != '' and self.custom_menu_name != settings.get(main_menu_override):
             try:
                 index = 0
-                if main_menu_override.get() in self.custom_menus:
-                    index = self.custom_menus[main_menu_override.get()].get_current_item_number()
-                self.menu = compute_menu_from_csv(os.path.join(CUSTOM_MENU_DIRECTORY, main_menu_override.get() + '.csv'))
+                if settings.get(main_menu_override) in self.custom_menus:
+                    index = self.custom_menus[settings.get(main_menu_override)].get_current_item_number()
+                self.menu = compute_menu_from_csv(os.path.join(CUSTOM_MENU_DIRECTORY, settings.get(main_menu_override) + '.csv'))
                 self.menu.select_item(index)
-                self.custom_menus[main_menu_override.get()] = self.menu
-                self.custom_menu_name = main_menu_override.get()
+                self.custom_menus[settings.get(main_menu_override)] = self.menu
+                self.custom_menu_name = settings.get(main_menu_override)
             except:
                 self.menu = self.menus['main']
                 self.custom_menu_name = ''
-        elif main_menu_override.get() == '' or name in self.menus and not (name == 'main'):
+        elif settings.get(main_menu_override) == '' or name in self.menus and not (name == 'main'):
             self.menu = self.menus[name]
             self.custom_menu_name = ''
     
@@ -644,8 +682,8 @@ class DirectionDisplay:
     
     def display_direction(self, direction: float): 
         current_position = MousePosition.current()
-        change = compute_mouse_position_with_direction_and_magnitude(direction, movement_amount.get())
-        scaled_change = change*direction_line_size.get()*(1/change.compute_magnitude())
+        change = compute_mouse_position_with_direction_and_magnitude(direction, settings.get(movement_amount))
+        scaled_change = change*settings.get(direction_line_size)*(1/change.compute_magnitude())
         target_position = current_position + scaled_change
         self.display.display(current_position, target_position, current_position)
     
