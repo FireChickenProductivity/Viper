@@ -281,7 +281,7 @@ class Actions:
             direction_handler.reverse_direction()
             hissing_control.update_mode(HissingControlMode.MOVEMENT)
             hissing_control.simulate_hissing_change()
-        else:
+        elif active != hissing_control.get_hissing_active():
             hissing_control.simulate_hissing_change()
     
     def fire_chicken_simulate_hissing_change(active: Union[None, bool] = None):
