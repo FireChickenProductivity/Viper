@@ -87,3 +87,6 @@ user.fire_chicken_hissing_control_use_literal_hiss_handler has type int. If nonz
 The display code for the direction line was heavily based on the knausj_talon configuration. Proper credit and a copy of the knausj_talon license is available in the direction_display.py file.
 
 Thank you to GitHub user whatIV for contributing to this project.
+
+## Known Issues
+The menu sometimes reopens after a hiss and keeps cycling through menu items untill you hiss again. The ending of the next hiss activates the selected menu item. 
