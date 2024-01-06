@@ -276,12 +276,9 @@ module.tag(HISSING_CONTROL_MANUALLY_DISABLED_TAG_NAME, desc = "Active when the h
 class Actions:
     def fire_chicken_hissing_control_handle_hiss(active: bool):
         ''''''
-        if settings.get(hissing_start_during_movement_reverses_direction) != 0 and active and hissing_control.get_hissing_active() and hissing_control.get_mode() == HissingControlMode.MOVEMENT:
-            hissing_control.simulate_hissing_change()
-            direction_handler.reverse_direction()
-            hissing_control.update_mode(HissingControlMode.MOVEMENT)
-            hissing_control.simulate_hissing_change()
-        else:
+        if should_hiss_reverse_direction(active):
+            move_in_reverse_direction()
+        elif active != hissing_control.get_hissing_active():
             hissing_control.simulate_hissing_change()
     
     def fire_chicken_simulate_hissing_change(active: Union[None, bool] = None):
@@ -383,6 +380,16 @@ class Actions:
         global hissing_control_manually_disabled
         hissing_control_manually_disabled = True
         tag_utilities.make_tag_only_active_tag_in_context('user.' + HISSING_CONTROL_MANUALLY_DISABLED_TAG_NAME, manual_disabling_context)
+
+def should_hiss_reverse_direction(active) -> bool:
+    return settings.get(hissing_start_during_movement_reverses_direction) != 0 and active and hissing_control.get_hissing_active() \
+        and hissing_control.get_mode() == HissingControlMode.MOVEMENT
+
+def move_in_reverse_direction():
+    hissing_control.simulate_hissing_change()
+    direction_handler.reverse_direction()
+    hissing_control.update_mode(HissingControlMode.MOVEMENT)
+    hissing_control.simulate_hissing_change()
 
 mouse_dragger = MouseDragger()
 
