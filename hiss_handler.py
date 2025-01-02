@@ -697,8 +697,8 @@ class DirectionDisplay:
     def hide(self):
         self.display.hide()
 
-direction_handler = DirectionHandler()
-hissing_control = HissingControl()
+direction_handler = None
+hissing_control = None
 
 @imgui.open()
 def gui(gui: imgui.GUI):
@@ -715,7 +715,9 @@ CUSTOMIZATION_DIRECTORY = None
 CUSTOM_MENU_DIRECTORY = None
 
 def on_ready():
-    global CUSTOMIZATION_DIRECTORY, CUSTOM_MENU_DIRECTORY
+    global CUSTOMIZATION_DIRECTORY, CUSTOM_MENU_DIRECTORY, direction_handler, hissing_control
+    direction_handler = DirectionHandler()
+    hissing_control = HissingControl()
     CUSTOMIZATION_DIRECTORY = os.path.join(actions.path.talon_user(), 'Viper Settings')
     CUSTOM_MENU_DIRECTORY = os.path.join(CUSTOMIZATION_DIRECTORY, 'Custom Menus')
     path_utilities.create_directory_if_nonexistent(CUSTOMIZATION_DIRECTORY)
